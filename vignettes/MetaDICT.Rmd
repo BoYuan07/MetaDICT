@@ -1,0 +1,145 @@
+---
+title: "MetaDICT"
+author: 
+  - Bo Yuan
+date: '`r format(Sys.Date(), "%B %d, %Y")`'
+output:
+  BiocStyle::html_document:
+    toc: true
+    toc_depth: 2
+bibliography: bibliography.bib
+vignette: >
+  %\VignetteIndexEntry{MetaDICT}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, message = FALSE, warning = FALSE, comment = NA, include = FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE, comment = NA, 
+                      fig.width = 6.25, fig.height = 5)
+
+
+library(DT)
+```
+
+
+# Introduction
+
+MetaDICT is a method for the integration of microbiome datasets. This method is designed to remove batch effects and preserve biological variation while integrating heterogeneous datasets. MetaDICT consists of two stages: the first stage provides an initial estimation of batch effect via covariate balancing, while batch effects is defined as heterogeneous capturing efficiency in sequencing measurement; the second stage refines the estimation by shared dictionary learning. Compared with other existing methods, MetaDICT can better avoid overcorrection when unobserved confounding variables are present. The integrated data set can be applied to downstream analysis such as PCoA, taxa/sample community detection and differential abundance test.
+
+# Installation
+
+The package can be downloaded from github:
+
+```{r,eval=FALSE}
+devtools::install_github("BoYuan07/MetaDICT")
+```
+
+Load the package:
+
+```{r}
+library(MetaDICT)
+```
+
+# Example data introduction
+
+Example data includes count tables and metadata tables from two simulated datasets, using gut microbiome data collected by He et al. [@he2018regional]. These two datasets share the same set of taxa, and each dataset contains 200 samples. A distance matrix is also provided, measuring the similarity among taxa.
+
+```{r}
+data("exampleData")
+```
+
+
+Significant batch effects are observed between these two datasets using PCoA plots.
+
+```{r}
+O = do.call(cbind,O_list)
+batchid = as.factor(c(rep("Batch 1",ncol(O_list[[1]])),rep("Batch 2",ncol(O_list[[2]]))))
+pcoa.plot.discrete(O,batchid,"Batches")
+```
+
+# Implementation of MetaDICT package
+
+## Data integration
+
+We apply MetaDICT to remove batch effects and integrate these two datasets.
+
+```{r}
+alpha = 0.01
+beta = 1
+gamma = 10
+metadict_res = metadict(O_list,dist,meta.list = meta.list,alpha = alpha,beta = beta,gamma = gamma)
+```
+
+The results from MetaDICT includes: 1) corrected count table $X$; 
+2) the estimated shared dictionary $D$; 3) the estimated sample representation $R$;  4) the estimated measurement efficiency $w$; 5) integrated meta table.
+
+```{r}
+X = metadict_res$X
+D = metadict_res$D
+R_list = metadict_res$R
+w = metadict_res$w
+meta = metadict_res$meta
+```
+
+
+## Conduct PCoA analysis.
+
+We apply PCoA analysis on the corrected count table:
+
+```{r}
+pcoa.plot.discrete(X,batchid,"Batches")
+```
+
+
+Batch effect is significantly reduced.
+
+## Community detection
+
+We can detect taxa communities and sample subpopulation using the output of MetaDICT. 
+
+Load ggraph for visualization:
+
+```{r}
+library(ggraph)
+```
+
+
+Taxa community detection:
+
+```{r}
+D_filter = D[,1:50]
+taxa_c = community_detection(D_filter, max_k = 5)
+taxa_cluster = taxa_c$cluster
+taxa_graph = taxa_c$graph
+ggraph(taxa_graph, layout = "stress") + 
+    geom_node_point(aes(color = as.factor(taxa_cluster)),size = 0.5) + 
+    theme_bw()+
+  xlab("")+
+  ylab("")
+```
+
+
+Subpopulation detection:
+
+```{r}
+R = do.call(cbind,R_list)
+sample_c = community_detection(t(R), max_k = 50)
+sample_cluster = sample_c$cluster
+sample_graph = sample_c$graph
+
+ggraph(sample_graph, layout = "stress") + 
+    geom_node_point(aes(color = as.factor(sample_cluster)),size = 0.5) + 
+    theme_bw()+
+  xlab("")+
+  ylab("")
+```
+
+
+# Session information
+
+```{r}
+sessionInfo()
+```
+
+# References
