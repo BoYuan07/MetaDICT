@@ -22,13 +22,13 @@ metadict(
 
 \item{dist}{Sequence dissimilarity matrix. Dissimilarity can be measured by phylogenetic distance or taxonomic dissimilarity.}
 
-\item{meta.list}{The \code{list} object contains metadata tables for different datasets.}
+\item{meta.list}{A \code{list} object contains metadata tables for different datasets.}
 
-\item{alpha}{The parameter is related to the rank of the final corrected count table. A larger alpha leads to a lower rank in the corrected count table.}
+\item{alpha}{This parameter is related to the rank of the final corrected count table. A larger alpha leads to a lower rank in the corrected count table.}
 
-\item{beta}{The parameter is related to the smoothness of the estimated measurement efficiency. A larger beta results in more similar measurement efficiency across taxa.}
+\item{beta}{This parameter is related to the smoothness of the estimated measurement efficiency. A larger beta results in more similar measurement efficiency across taxa.}
 
-\item{gamma}{The parameter is related to how well the model fits the data.}
+\item{gamma}{This parameter is related to how well the model fits the data.}
 
 \item{normalization}{Normalization method. Upper quantile or RSim.}
 

@@ -1,12 +1,12 @@
 #' @title Community detection.
 #'
-#' @description A \code{k}-nearest neighbor graph based on Euclidean distance. Then community detection method is applied to identify communities. Various values of \code{k} within a specific range are tried and the one that yields the highest average Silhouette score is selected.
+#' @description A \code{k}-nearest neighbor graph is constructed based on Euclidean distance. Then community detection method is applied to identify communities. Various values of \code{k} within a specific range are tried and the one that yields the highest average Silhouette score is selected.
 #'
 #' @importFrom RANN nn2
 #' @importFrom igraph cluster_louvain
 #' @importFrom igraph cluster_walktrap
 #'
-#' @param X Representation. The rows represent samples, the columns represent features.
+#' @param X Input data. The rows represent clustering objects, the columns represent features.
 #' @param max_k The largest number of connected neighbors.
 #' @param min_k The smallest number of connected neighbors.
 #' @param method Community detection methods such as Louvain and Walktrap.
@@ -14,13 +14,13 @@
 #'
 #' @returns a \code{list} with components:
 #' \itemize{
-#' \item{\code{cluster}, estimated cluster labels.}
+#' \item{\code{cluster}, the estimated cluster labels.}
 #' \item{\code{graph}, the \code{k}-nearest neighbor graph.}
 #' }
 #'
 #' @export
 
-community_detection = function(X, max_k = 50, resolution=1, method = "Louvain", min_k = 5){
+community_detection = function(X, max_k = 50, method = "Louvain", resolution=1, min_k = 5){
   avg_silwidth = numeric()
   k.list = c()
   for(k in min_k:max_k){

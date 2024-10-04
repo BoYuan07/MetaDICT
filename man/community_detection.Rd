@@ -7,29 +7,29 @@
 community_detection(
   X,
   max_k = 50,
-  resolution = 1,
   method = "Louvain",
+  resolution = 1,
   min_k = 5
 )
 }
 \arguments{
-\item{X}{Representation. The rows represent samples, the columns represent features.}
+\item{X}{Input data. The rows represent clustering objects, the columns represent features.}
 
 \item{max_k}{The largest number of connected neighbors.}
 
-\item{resolution}{The resolution parameter of Louvain algorithm.}
-
 \item{method}{Community detection methods such as Louvain and Walktrap.}
+
+\item{resolution}{The resolution parameter of Louvain algorithm.}
 
 \item{min_k}{The smallest number of connected neighbors.}
 }
 \value{
 a \code{list} with components:
 \itemize{
-\item{\code{cluster}, estimated cluster labels.}
+\item{\code{cluster}, the estimated cluster labels.}
 \item{\code{graph}, the \code{k}-nearest neighbor graph.}
 }
 }
 \description{
-A \code{k}-nearest neighbor graph based on Euclidean distance. Then community detection method is applied to identify communities. Various values of \code{k} within a specific range are tried and the one that yields the highest average Silhouette score is selected.
+A \code{k}-nearest neighbor graph is constructed based on Euclidean distance. Then community detection method is applied to identify communities. Various values of \code{k} within a specific range are tried and the one that yields the highest average Silhouette score is selected.
 }

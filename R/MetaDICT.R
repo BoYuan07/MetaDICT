@@ -15,11 +15,11 @@
 #'  metadict_res = metadict(O_list,dist,meta.list = meta.list)
 #'
 #' @param O_list A \code{list} object contains count tables for different datasets. The rows represent taxa, and the columns represent samples. All count tables must have the same taxa.
-#' @param alpha The parameter is related to the rank of the final corrected count table. A larger alpha leads to a lower rank in the corrected count table.
-#' @param beta The parameter is related to the smoothness of the estimated measurement efficiency. A larger beta results in more similar measurement efficiency across taxa.
-#' @param gamma The parameter is related to how well the model fits the data.
+#' @param alpha This parameter is related to the rank of the final corrected count table. A larger alpha leads to a lower rank in the corrected count table.
+#' @param beta This parameter is related to the smoothness of the estimated measurement efficiency. A larger beta results in more similar measurement efficiency across taxa.
+#' @param gamma This parameter is related to how well the model fits the data.
 #' @param dist Sequence dissimilarity matrix. Dissimilarity can be measured by phylogenetic distance or taxonomic dissimilarity.
-#' @param meta.list The \code{list} object contains metadata tables for different datasets.
+#' @param meta.list A \code{list} object contains metadata tables for different datasets.
 #' @param normalization Normalization method. Upper quantile or RSim.
 #' @param max_iter Maximum number of iterations for the optimization process.
 #' @param neighbor The number of nearest neighbors used to construct the taxa neighbor graph. The default is 5.
@@ -74,7 +74,7 @@ metadict = function(O_list,dist,meta.list = NULL, alpha = 1,beta = 0.01, gamma =
       print("Successful convergence.")
   }
   if(optim.res$convergence==1){
-      print("The iteration limit maxit had been reached.")
+      print("The iteration limit max_iter had been reached.")
   }
   x = optim.res$par
   para = convert_from_vec(x,m,r,d,sample_num)
