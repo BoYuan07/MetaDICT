@@ -5,6 +5,7 @@
 #' @details MetaDICT is a two-step approach. It initially estimates the batch effects by weighting methods in causal inference literature then refines the estimation via a shared dictionary learning.
 #'
 #' @importFrom stats optim
+#' @importFrom edgeR calcNormFactors
 #'
 #' @examples
 #'
