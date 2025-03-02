@@ -2,22 +2,36 @@
 % Please edit documentation in R/supporting_function.R
 \name{pcoa.plot.discrete}
 \alias{pcoa.plot.discrete}
-\title{PCoA plots for discrete variable with bray-curtis distance.}
+\title{PCoA plots for discrete variables.}
 \usage{
-pcoa.plot.discrete(A, covariate, main, colorset = "Set1")
+pcoa.plot.discrete(
+  X,
+  covariate,
+  title,
+  R2 = TRUE,
+  dissimilarity = "Bray-Curtis",
+  colorset = "Set1",
+  point_size = 1
+)
 }
 \arguments{
-\item{A}{Abundance matrix. The rows represent taxa, the columns represent samples.}
+\item{X}{Abundance matrix. The rows represent taxa, the columns represent samples.}
 
 \item{covariate}{A discrete sample covariate.}
 
-\item{main}{Graph title.}
+\item{title}{Graph title.}
+
+\item{R2}{A logical variable. Whether to show R2 statistic in the subtitle. Default is TRUE.}
+
+\item{dissimilarity}{The dissimilarity type, “Bray-Curtis” for Bray-Curtis dissimilarity, “Euclidean” for generalized UniFrac dissimilarity.}
 
 \item{colorset}{Color set. Default is \code{Set1}.}
+
+\item{point_size}{Point size. Default is 1.}
 }
 \value{
 a PCoA plot.
 }
 \description{
-PCoA plots for discrete variable with bray-curtis distance.
+PCoA plots for discrete variables.
 }

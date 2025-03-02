@@ -6,7 +6,7 @@ Description: MetaDICT is a method for the integration of microbiome data. This m
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 Imports: stats, RANN, igraph, vegan, edgeR, ecodist, ggplot2, viridis
 BugReports: https://github.com/BoYuan07/MetaDICT/issues
 URL: https://github.com/BoYuan07/MetaDICT
@@ -17,3 +17,4 @@ Suggests:
 Config/testthat/edition: 3
 LazyData: True
 VignetteBuilder: knitr
+

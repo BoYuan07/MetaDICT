@@ -1,6 +1,7 @@
-#' @title Community detection.
+#' @title Taxa/Sample Community detection.
 #'
-#' @description A \code{k}-nearest neighbor graph is constructed based on Euclidean distance. Then community detection method is applied to identify communities. Various values of \code{k} within a specific range are tried and the one that yields the highest average Silhouette score is selected.
+#' @description A \code{k}-nearest neighbor graph is constructed based on Euclidean distance. Then community detection method is applied to identify communities. 
+#' Various values of \code{k} within a specific range are tried and the one that yields the highest average Silhouette score is selected.
 #'
 #' @importFrom RANN nn2
 #' @importFrom igraph cluster_louvain
@@ -19,20 +20,20 @@
 #' }
 #'
 #' @export
-
-community_detection = function(X, max_k = 50, method = "Louvain", resolution=1, min_k = 5){
-  avg_silwidth = numeric()
-  k.list = c()
+community_detection <- function(X, max_k = 10, method = "Louvain", resolution=1, min_k = 2){
+  avg_silwidth <- numeric()
+  k.list <- c()
   for(k in min_k:max_k){
-   membership = cluster_core(X,k,resolution,method)$membership
+   membership <- cluster_core(X,k,resolution,method)$membership
    if(length(unique(membership))!=1){
-        avg_silwidth= c(avg_silwidth,mean(cluster::silhouette(membership, dist(X, method = "euclidean"))[,3], na.rm = TRUE))
-        k.list = c(k.list,k)
+        avg_silwidth <- c(avg_silwidth,mean(cluster::silhouette(membership, dist(X, method = "euclidean"))[,3], na.rm = TRUE))
+        k.list <- c(k.list,k)
    }
   }
-  best_k = k.list[which.max(avg_silwidth)]
-  best_res = cluster_core(X,best_k,resolution,method)
-  return(list("cluster" = best_res$membership, "graph" = best_res$graph))
+  best_k <- k.list[which.max(avg_silwidth)]
+  best_res <- cluster_core(X,best_k,resolution,method)
+  clustring <- paste("Cluster", best_res$membership)
+  return(list("cluster" = clustring, "graph" = best_res$graph))
 }
 
 cluster_core = function(X,k,resolution,method = "Louvain"){
@@ -50,44 +51,59 @@ cluster_core = function(X,k,resolution,method = "Louvain"){
     }else if(method == "Walktrap"){
         km <- igraph::cluster_walktrap(g)
     }
-    return(list("membership"=km$membership,"graph"=g))
+    return(list("membership" = km$membership, "graph" = g))
 }
 
 
-#' @title PCoA plots for discrete variable with bray-curtis distance.
+#' @title PCoA plots for discrete variables.
 #'
 #' @importFrom vegan adonis2
 #' @importFrom ecodist bcdist
 #' @import ggplot2
 #'
-#' @param A Abundance matrix. The rows represent taxa, the columns represent samples.
+#' @param X Abundance matrix. The rows represent taxa, the columns represent samples.
 #' @param covariate A discrete sample covariate.
-#' @param main Graph title.
+#' @param title Graph title.
+#' @param R2 A logical variable. Whether to show R2 statistic in the subtitle. Default is TRUE.
+#' @param dissimilarity The dissimilarity type, “Bray-Curtis” for Bray-Curtis dissimilarity, “Euclidean” for generalized UniFrac dissimilarity.
 #' @param colorset Color set. Default is \code{Set1}.
+#' @param point_size Point size. Default is 1.
 #'
 #' @returns a PCoA plot.
 #'
 #' @export
-pcoa.plot.discrete = function(A,covariate,main,colorset = "Set1"){
-  dist_matrix = bcdist(t(A))
-  mds.stuff = cmdscale(dist_matrix, eig=T, x.ret=T)
-  mds.var.per = round(mds.stuff$eig/sum(mds.stuff$eig)*100,1)
-  mds.values = mds.stuff$points
-  mds.data = data.frame( X=mds.values[,1],
+pcoa.plot.discrete = function(X, covariate, title, R2 = TRUE, dissimilarity = "Bray-Curtis", colorset = "Set1",point_size = 1){
+  if(dissimilarity == "Bray-Curtis"){
+     dist_matrix <- bcdist(t(X))
+  }else if(dissimilarity == "Euclidean"){
+    dist_matrix <- dist(t(X),method = "euclidean")
+  }
+ 
+  mds.stuff <- cmdscale(dist_matrix, eig=T, x.ret=T)
+  mds.var.per <- round(mds.stuff$eig/sum(mds.stuff$eig)*100,1)
+  mds.values <- mds.stuff$points
+  mds.data <- data.frame(X=mds.values[,1],
                          Y=mds.values[,2],
                          Sample = covariate)
+  p <- ggplot(data=mds.data, aes(x=X, y=Y,color=Sample))+
+      geom_point(size=point_size)+
+      xlab(paste("PCoA1 -", mds.var.per[1], '%', sep=""))+
+      ylab(paste("PCoA2 -", mds.var.per[2], '%', sep=""))+
+      labs(title = title)+
+      theme_bw()+
+      theme(legend.title=element_blank())+
+      scale_color_brewer(palette=colorset)+
+      theme(legend.key.height=unit(0.5,"cm"),
+          legend.title = element_text(size = 14),  
+          legend.text  = element_text(size = 12),
+          plot.title = element_text(size = 20))
 
-  r2 = permanova_pcoa(dist_matrix,covariate)
-  ggplot(data=mds.data, aes(x=X, y=Y,color=Sample))+
-    geom_point(size=1)+
-    xlab(paste("PCoA1 -", mds.var.per[1], '%', sep=""))+
-    ylab(paste("PCoA2 -", mds.var.per[2], '%', sep=""))+
-    labs(title = main,
-              subtitle = paste("R2 =",round(r2, digits = 4)))+
-    theme_bw()+
-    theme(legend.title=element_blank())+
-    scale_color_brewer(palette=colorset)+
-    theme(legend.key.height=unit(0.5,"cm"))
+  if(R2){
+    r2 <- permanova_pcoa(dist_matrix,covariate)
+    p <- p + labs(subtitle = paste("R2 =",round(r2, digits = 4)))+
+    theme(plot.subtitle = element_text(size = 16))
+  }
+  return(p)
 }
 
 permanova_pcoa <- function(distP, Y) {
@@ -96,39 +112,56 @@ permanova_pcoa <- function(distP, Y) {
   return(Re$R2[1])
 }
 
-#' @title PCoA plots for continuous variable with bray-curtis distance.
+#' @title PCoA plots for continuous variables.
 #'
 #' @importFrom vegan adonis2
 #' @importFrom ecodist bcdist
 #' @import ggplot2
 #' @import viridis
 #'
-#' @param A Abundance matrix. The rows represent taxa, the columns represent samples.
-#' @param covariate A continuous sample covariate.
-#' @param main Graph title.
-#'
+#' @param X Abundance matrix. The rows represent taxa, the columns represent samples.
+#' @param covariate A discrete sample covariate.
+#' @param title Graph title.
+#' @param R2 A logical variable. Whether to show R2 statistic in the subtitle. Default is TRUE.
+#' @param dissimilarity The dissimilarity type, “Bray-Curtis” for Bray-Curtis dissimilarity, 
+#' “Euclidean” for generalized UniFrac dissimilarity.
+#' @param point_size Point size. Default is 1.
+#' 
 #' @returns a PCoA plot.
 #'
 #' @export
-pcoa.plot.continuous = function(A,covariate,main){
-  dist_matrix = bcdist(t(A))
-  mds.stuff = cmdscale(dist_matrix, eig=T, x.ret=T)
-  mds.var.per = round(mds.stuff$eig/sum(mds.stuff$eig)*100,1)
-  mds.values = mds.stuff$points
-  mds.data = data.frame(X=mds.values[,1],
+pcoa.plot.continuous = function(X, covariate, title, R2 = TRUE, dissimilarity = "Bray-Curtis", point_size = 1){
+  if(dissimilarity == "Bray-Curtis"){
+     dist_matrix <- bcdist(t(X))
+  }else if(dissimilarity == "Euclidean"){
+    dist_matrix <- dist(t(X),method = "euclidean")
+  }
+  mds.stuff <- cmdscale(dist_matrix, eig=T, x.ret=T)
+  mds.var.per <- round(mds.stuff$eig/sum(mds.stuff$eig)*100,1)
+  mds.values <- mds.stuff$points
+  mds.data <- data.frame(X=mds.values[,1],
                          Y=mds.values[,2],
                          Signal = covariate)
-  r2 = permanova_pcoa(dist_matrix,covariate)
-  ggplot(data=mds.data, aes(x=X, y=Y,col=Signal))+
-    geom_point(size=1)+
-    scale_colour_gradientn(colors = viridis(10))+
-    theme(legend.title=element_blank()) +
-    xlab(paste("PCoA1 -", mds.var.per[1], '%', sep=""))+
-    ylab(paste("PCoA2 -", mds.var.per[2], '%', sep=""))+
-    labs(title = main,
-              subtitle = paste("R2 =",round(r2, digits = 4)))+
-    theme_bw()+
-    theme(legend.key.height=unit(0.5,"cm"))
+
+  p <- ggplot(data=mds.data, aes(x=X, y=Y,color=Sample))+
+      geom_point(size=point_size)+
+      scale_colour_gradientn(colors = viridis(10))+
+      xlab(paste("PCoA1 -", mds.var.per[1], '%', sep=""))+
+      ylab(paste("PCoA2 -", mds.var.per[2], '%', sep=""))+
+      labs(title = title)+
+      theme_bw()+
+      scale_color_brewer(palette=colorset)+
+      theme(legend.key.height=unit(0.5,"cm"),
+          legend.title = element_text(size = 14),  
+          legend.text  = element_text(size = 12),
+          plot.title = element_text(size = 20))
+
+  if(R2){
+    r2 <- permanova_pcoa(dist_matrix,covariate)
+    p <- p + labs(subtitle = paste("R2 =",round(r2, digits = 4)))+
+    theme(plot.subtitle = element_text(size = 16))
+  }
+  return(p)
 }
 
 

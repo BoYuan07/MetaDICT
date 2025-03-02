@@ -1,5 +1,5 @@
 ---
-title: "MetaDICT"
+title: "MetaDICT Package Vignette"
 author: 
   - Bo Yuan
 date: '`r format(Sys.Date(), "%B %d, %Y")`'
@@ -18,21 +18,26 @@ vignette: >
 knitr::opts_chunk$set(message = FALSE, warning = FALSE, comment = NA, 
                       fig.width = 6.25, fig.height = 5)
 
-
 library(DT)
 ```
 
 
 # Introduction
 
-MetaDICT is a method for the integration of microbiome datasets. This method is designed to remove batch effects and preserve biological variation while integrating heterogeneous datasets. MetaDICT consists of two stages: the first stage provides an initial estimation of batch effect via covariate balancing, while batch effects is defined as heterogeneous capturing efficiency in sequencing measurement; the second stage refines the estimation by shared dictionary learning. Compared with other existing methods, MetaDICT can better avoid overcorrection when unobserved confounding variables are present. The integrated data set can be applied to downstream analysis such as PCoA, taxa/sample community detection and differential abundance test.
+MetaDICT is a computational method designed for the **integration of microbiome datasets**, effectively addressing **batch effects** while preserving **biological variation** across heterogeneous datasets.  
+
+The method operates in **two stages**:
+1. **Initial Batch Effect Estimation** – Utilizes **covariate balancing** to estimate batch effects, which are defined as **heterogeneous sequencing efficiency** across datasets.
+2. **Refinement via Shared Dictionary Learning** – Further refines batch effect estimation by leveraging shared structures across datasets.  
+
+Compared to existing methods, **MetaDICT minimizes overcorrection** when **unobserved confounding variables** are present, ensuring a more reliable integration of datasets. The resulting integrated data can be applied to **downstream analyses**, including **Principal Coordinates Analysis (PCoA)**, **taxa/sample community detection**, and **differential abundance testing**.
 
 # Installation
 
 The package can be downloaded from github:
 
 ```{r,eval=FALSE}
-devtools::install_github("BoYuan07/MetaDICT")
+devtools::install_github("BoYuan07/MetaDICT", build_vignettes = TRUE)
 ```
 
 Load the package:
@@ -41,58 +46,129 @@ Load the package:
 library(MetaDICT)
 ```
 
-# Example data introduction
+# Implementation of MetaDICT
 
-Example data includes count tables and metadata tables from two simulated datasets, using gut microbiome data collected by He et al. [@he2018regional]. These two datasets share the same set of taxa, and each dataset contains 200 samples. A distance matrix is also provided, measuring the similarity among taxa.
+## Example data
+
+Example dataset contains two simulated datasets, using gut microbiome data collected by He et al. [@he2018regional]. These two datasets share the same set of taxa, and each dataset contains 200 samples. Load the example sample:
 
 ```{r}
 data("exampleData")
 ```
 
+The object contains the following components:  
 
-Significant batch effects are observed between these two datasets using PCoA plots.
+- **Integrated count matrix (`O`)** – Merged abundance data from both datasets, which is taxa-by-sample matrix.  
+- **Meta table (`meta`)** – The sample metadata includes information for both datasets. It contains:  `batch` – A column indicating the dataset source (`Dataset1` or `Dataset2`); `Y` – A covariate associated with microbial compositions; `Y2` – An uninformative covariate with no biological relevance. 
+- **Sequence distance matrix (`dist_mat`)** – A distance matrix quantifying relationships between sequences.  
+- **Phylogenetic tree (`tree`)** – Evolutionary relationships among the taxa.  
+- **Taxonomy table (`taxonomy`)** – Hierarchical classification of the taxa.  
+
+We will use this example data to illustrate how to use MetaDICT.
+
+Significant batch effects are observed between these two datasets on PCoA plots.
 
 ```{r}
-O = do.call(cbind,O_list)
-batchid = as.factor(c(rep("Batch 1",ncol(O_list[[1]])),rep("Batch 2",ncol(O_list[[2]]))))
-pcoa.plot.discrete(O,batchid,"Batches")
+batchid = meta$batch
+pcoa.plot.discrete(O,batchid,"Batch")
+```
+
+The PCoA plots of target variable `Y`:
+
+```{r}
+Y = meta$Y
+pcoa.plot.discrete(O,Y,"Sample", colorset = "Set2")
 ```
 
 # Implementation of MetaDICT package
 
 ## Data integration
 
-We apply MetaDICT to remove batch effects and integrate these two datasets.
+We apply MetaDICT to remove batch effects and integrate these two datasets. MetaDICT requires three inputs: integrated count table, integrated meta table, and taxa dissimilarity matrix used for measurement efficiency (batch effect) estimation. A taxa dissimilarity matrix can directly be used in MetaDICT:
 
 ```{r}
-alpha = 0.01
-beta = 1
-gamma = 10
-metadict_res = metadict(O_list,dist,meta.list = meta.list,alpha = alpha,beta = beta,gamma = gamma)
+metadict_res = MetaDICT(O, meta, distance_matrix = dist_mat)
 ```
 
-The results from MetaDICT includes: 1) corrected count table $X$; 
-2) the estimated shared dictionary $D$; 3) the estimated sample representation $R$;  4) the estimated measurement efficiency $w$; 5) integrated meta table.
+The results from MetaDICT includes: 
+1) corrected count table $X$; 
+2) the estimated shared dictionary $D$; 
+3) the estimated sample representation $R$;  
+4) the estimated measurement efficiency $w$; 
+5) integrated meta table.
 
 ```{r}
-X = metadict_res$X
+X = metadict_res$count
 D = metadict_res$D
 R_list = metadict_res$R
 w = metadict_res$w
-meta = metadict_res$meta
+meta_output = metadict_res$meta
 ```
 
-
-## Conduct PCoA analysis.
-
-We apply PCoA analysis on the corrected count table:
+Batch effect is significantly reduced using MetaDICT:
 
 ```{r}
-pcoa.plot.discrete(X,batchid,"Batches")
+pcoa.plot.discrete(X,batchid,"Batch")
+```
+
+```{r}
+pcoa.plot.discrete(X,Y,"Sample",colorset = "Set2")
 ```
 
 
-Batch effect is significantly reduced.
+MetaDICT can also accept a phylogenetic tree as input and uses phylogenetic information to estimate taxa similarity:
+
+```{r}
+metadict_res1 = MetaDICT(O, meta, tree = tree)
+X1 = metadict_res1$count
+```
+
+```{r}
+pcoa.plot.discrete(X1,batchid,"Batch")
+```
+
+```{r}
+pcoa.plot.discrete(X1,Y,"Sample",colorset = "Set2")
+```
+
+If phylogenetic tree is not available, MetaDICT can use taxonomic information to estimate taxa similarity. In this case, the taxonomy level of the count table must be specified.
+
+```{r}
+metadict_res2 = MetaDICT(O, meta, taxonomy = taxonomy, tax_level = "order")
+X2 = metadict_res2$count
+```
+```{r}
+pcoa.plot.discrete(X2,batchid,"Batch")
+```
+
+```{r}
+pcoa.plot.discrete(X2,Y,"Sample",colorset = "Set2")
+```
+
+
+Users can specify the covariates that should be included in MetaDICT using `covariates`. In this example, we only use   `Y2` in the covariate balancing step. MetaDICT is able to preserve the biological variation of `Y` even when `Y` is not observed.
+
+```{r}
+metadict_res3 = MetaDICT(O,meta,covariates = c("Y2"), 
+                         distance_matrix = dist_mat)
+X3 = metadict_res3$count
+```
+```{r}
+pcoa.plot.discrete(X3,batchid,"Batch")
+```
+
+```{r}
+pcoa.plot.discrete(X3,Y,"Sample",colorset = "Set2")
+```
+
+
+MetaDICT includes two predefined parameters $\alpha$ and $\beta$. The parameter $\alpha$ enforces the low-rank structure of shared dictionary. The parameter $\beta$ enforces the smoothness of estimated measurement efficiency. If `customize_parameter = FALSE`, MetaDICT automatically selects parameters based on the provided inputs. When `customize_parameter = TRUE`, users can manually set parameter values to customize the analysis.
+
+```{r}
+metadict_res4 = MetaDICT(O,meta,distance_matrix = dist_mat,
+                         customize_parameter = TRUE, alpha = 0.01, beta = 0.1)
+```
+
 
 ## Community detection
 
@@ -105,34 +181,31 @@ library(ggraph)
 ```
 
 
-Taxa community detection:
+Shared dictionary `D` can be used in taxa community detection. The number of columns used in this process is determined using the elbow of column-wise squared norms.
 
 ```{r}
-D_filter = D[,1:50]
+D = metadict_res4$D
+plot(diag(t(D)%*%(D)))
+```
+
+The elbow value is around 20. We apply community detection method:
+
+```{r}
+D_filter = D[,1:20]
 taxa_c = community_detection(D_filter, max_k = 5)
 taxa_cluster = taxa_c$cluster
 taxa_graph = taxa_c$graph
-ggraph(taxa_graph, layout = "stress") + 
-    geom_node_point(aes(color = as.factor(taxa_cluster)),size = 0.5) + 
-    theme_bw()+
-  xlab("")+
-  ylab("")
-```
-
-
-Subpopulation detection:
-
-```{r}
-R = do.call(cbind,R_list)
-sample_c = community_detection(t(R), max_k = 50)
-sample_cluster = sample_c$cluster
-sample_graph = sample_c$graph
-
-ggraph(sample_graph, layout = "stress") + 
-    geom_node_point(aes(color = as.factor(sample_cluster)),size = 0.5) + 
-    theme_bw()+
-  xlab("")+
-  ylab("")
+ggraph(taxa_graph, layout = "stress") +  
+    geom_node_point(aes(color = as.factor(taxa_cluster)), size = 2) +  
+    scale_color_brewer(palette = "Set1", name = "Taxa Cluster") + 
+    theme_bw() +
+    xlab("") +
+    ylab("") +
+    theme(
+        legend.position = "right",  
+        legend.title = element_text(size = 12, face = "bold"),  
+        legend.text = element_text(size = 10)  
+    )
 ```
 
 

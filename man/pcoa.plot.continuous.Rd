@@ -2,20 +2,34 @@
 % Please edit documentation in R/supporting_function.R
 \name{pcoa.plot.continuous}
 \alias{pcoa.plot.continuous}
-\title{PCoA plots for continuous variable with bray-curtis distance.}
+\title{PCoA plots for continuous variables.}
 \usage{
-pcoa.plot.continuous(A, covariate, main)
+pcoa.plot.continuous(
+  X,
+  covariate,
+  title,
+  R2 = TRUE,
+  dissimilarity = "Bray-Curtis",
+  point_size = 1
+)
 }
 \arguments{
-\item{A}{Abundance matrix. The rows represent taxa, the columns represent samples.}
+\item{X}{Abundance matrix. The rows represent taxa, the columns represent samples.}
 
-\item{covariate}{A continuous sample covariate.}
+\item{covariate}{A discrete sample covariate.}
 
-\item{main}{Graph title.}
+\item{title}{Graph title.}
+
+\item{R2}{A logical variable. Whether to show R2 statistic in the subtitle. Default is TRUE.}
+
+\item{dissimilarity}{The dissimilarity type, “Bray-Curtis” for Bray-Curtis dissimilarity,
+“Euclidean” for generalized UniFrac dissimilarity.}
+
+\item{point_size}{Point size. Default is 1.}
 }
 \value{
 a PCoA plot.
 }
 \description{
-PCoA plots for continuous variable with bray-curtis distance.
+PCoA plots for continuous variables.
 }

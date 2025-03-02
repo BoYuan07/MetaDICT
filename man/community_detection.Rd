@@ -2,14 +2,14 @@
 % Please edit documentation in R/supporting_function.R
 \name{community_detection}
 \alias{community_detection}
-\title{Community detection.}
+\title{Taxa/Sample Community detection.}
 \usage{
 community_detection(
   X,
-  max_k = 50,
+  max_k = 10,
   method = "Louvain",
   resolution = 1,
-  min_k = 5
+  min_k = 2
 )
 }
 \arguments{
@@ -31,5 +31,6 @@ a \code{list} with components:
 }
 }
 \description{
-A \code{k}-nearest neighbor graph is constructed based on Euclidean distance. Then community detection method is applied to identify communities. Various values of \code{k} within a specific range are tried and the one that yields the highest average Silhouette score is selected.
+A \code{k}-nearest neighbor graph is constructed based on Euclidean distance. Then community detection method is applied to identify communities.
+Various values of \code{k} within a specific range are tried and the one that yields the highest average Silhouette score is selected.
 }
