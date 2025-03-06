@@ -7,7 +7,7 @@ MetaDICT is a method for the integration of microbiome datasets. This method is 
 The package can be downloaded from github: 
 
 ```
-devtools::install_github("BoYuan07/MetaDICT, build_vignettes = TRUE")
+devtools::install_github("BoYuan07/MetaDICT", build_vignettes = TRUE)
 ```
 
 Load the package:
