@@ -13,21 +13,22 @@ community_detection(
 )
 }
 \arguments{
-\item{X}{Input data. The rows represent clustering objects, the columns represent features.}
+\item{X}{Input data.
+Rows represent clustering objects, and columns represent features.}
 
 \item{max_k}{The largest number of connected neighbors.}
 
-\item{method}{Community detection methods such as Louvain and Walktrap.}
+\item{method}{The community detection method to use. Options include \code{"Louvain"} and \code{"Walktrap"}.}
 
-\item{resolution}{The resolution parameter of Louvain algorithm.}
+\item{resolution}{The resolution parameter for the Louvain algorithm.}
 
 \item{min_k}{The smallest number of connected neighbors.}
 }
 \value{
-a \code{list} with components:
+A \code{list} with the following components:
 \itemize{
-\item{\code{cluster}, the estimated cluster labels.}
-\item{\code{graph}, the \code{k}-nearest neighbor graph.}
+\item{\code{cluster}}{ – The estimated cluster labels.}
+\item{\code{graph}}{ – The \code{k}-nearest neighbor graph.}
 }
 }
 \description{

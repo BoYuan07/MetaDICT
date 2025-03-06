@@ -15,19 +15,26 @@ pcoa.plot.discrete(
 )
 }
 \arguments{
-\item{X}{Abundance matrix. The rows represent taxa, the columns represent samples.}
+\item{X}{Abundance matrix.
+Rows represent taxa, and columns represent samples.}
 
 \item{covariate}{A discrete sample covariate.}
 
-\item{title}{Graph title.}
+\item{title}{The title of the graph.}
 
-\item{R2}{A logical variable. Whether to show R2 statistic in the subtitle. Default is TRUE.}
+\item{R2}{A logical variable.
+Whether to display the R² statistic in the subtitle. Default is \code{TRUE}.}
 
-\item{dissimilarity}{The dissimilarity type, “Bray-Curtis” for Bray-Curtis dissimilarity, “Euclidean” for generalized UniFrac dissimilarity.}
+\item{dissimilarity}{The dissimilarity type.
+Options include:
+\itemize{
+\item \code{"Bray-Curtis"} for Bray-Curtis dissimilarity.
+\item \code{"Euclidean"} for generalized UniFrac dissimilarity.
+}}
 
-\item{colorset}{Color set. Default is \code{Set1}.}
+\item{colorset}{The color set for visualization. Default is \code{"Set1"}.}
 
-\item{point_size}{Point size. Default is 1.}
+\item{point_size}{The size of the points in the plot. Default is \code{1}.}
 }
 \value{
 a PCoA plot.

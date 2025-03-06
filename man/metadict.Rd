@@ -17,56 +17,63 @@ MetaDICT(
   beta = 0.01,
   normalization = "uq",
   max_iter = 10000,
+  imputation = FALSE,
   verbose = TRUE,
   optim_trace = FALSE
 )
 }
 \arguments{
-\item{count}{The integrated count table of taxa by samples. The
-\code{count} parameter should be provided as either a \code{matrix} or a
-\code{data.frame}.}
+\item{count}{The integrated count table (taxa-by-sample matrix).
+Should be provided as either a \code{matrix} or a \code{data.frame}.}
 
-\item{meta}{The integrated meta table \code{meta} contains sample information
-and batch id.}
+\item{meta}{The integrated meta table containing sample information
+and batch IDs.}
 
-\item{covariates}{The covariates used in data integration. Default is all.}
+\item{covariates}{The covariates used in data integration. Default is \code{"all"}.}
 
-\item{tree}{The phylogenetic tree (optional if distance matrix or taxonomy is provided).}
+\item{tree}{The phylogenetic tree (optional if a distance matrix or taxonomy is provided).}
 
-\item{taxonomy}{The taxonomy table (optional if distance matrix or phylogenetic tree is provided).}
+\item{taxonomy}{The taxonomy table (optional if a distance matrix or phylogenetic tree is provided).}
 
-\item{distance_matrix}{The \code{matrix} that measures the dismilarity of taxa. Default is NULL and MetaDICT generates
-distance matrix based on phylogenetic tree and taxonomic information.}
+\item{distance_matrix}{A \code{matrix} measuring the dissimilarity of taxa.
+Default is \code{NULL}, in which case MetaDICT generates a distance matrix
+based on phylogenetic and taxonomic information.}
 
-\item{tax_level}{The taxonomic level of count table.}
+\item{tax_level}{The taxonomic level of the count table.}
 
-\item{customize_parameter}{A logical variable. TRUE if the parameters of alpha and beta
-are customized. FALSE if the parameters are determined by MetaDICT based on the number
-of covariates provided.}
+\item{customize_parameter}{A logical variable. Set to \code{TRUE} if the
+\code{alpha} and \code{beta} parameters are customized. If \code{FALSE},
+MetaDICT determines these parameters based on the number of covariates.}
 
-\item{alpha}{This parameter is related to the rank of the final corrected count table.
-A larger alpha leads to a lower rank of shared dictionary.}
+\item{alpha}{A parameter controlling the rank of the final corrected count table.
+A larger \code{alpha} leads to a lower-rank shared dictionary.}
 
-\item{beta}{This parameter is related to the smoothness of the estimated measurement efficiency.
-A larger beta results in more similar measurement efficiency across taxa.}
+\item{beta}{A parameter controlling the smoothness of the estimated measurement efficiency.
+A larger \code{beta} results in more similar measurement efficiencies across taxa.}
 
-\item{normalization}{Normalization method. Upper quantile or RSim. Set to be NULL if
-normalization is not needed.}
+\item{normalization}{The normalization method. Options are \code{"Upper quantile"}, \code{"RSim"} or \code{"TSS"}.
+Set to \code{NULL} if normalization is not needed.}
 
-\item{max_iter}{Maximum number of iterations for the optimization process. Default is 10000.}
+\item{max_iter}{The maximum number of iterations for the optimization process. Default is \code{10000}.}
 
-\item{verbose}{A logical variable. Wheter to generate verbose output. Default is TRUE.}
+\item{imputation}{A logical variable. Whether to allow MetaDICT to perform imputation
+based on dictionary learning results. Default is \code{FALSE}.}
 
-\item{optim_trace}{A logical variable. Whether to print the optimization step. Default is FALSE.}
+\item{verbose}{A logical variable. Whether to generate verbose output. Default is \code{TRUE}.}
+
+\item{optim_trace}{A logical variable. Whether to print optimization steps. Default is \code{FALSE}.}
 }
 \value{
-a \code{list} with components:
+A \code{list} with the following components:
 \itemize{
-\item{\code{count}, a \code{data.frame}. Corrected count table. Rows represent taxa. Columns represent samples.}
-\item{\code{D}, a \code{matrix}. Estimated shared dictionary.}
-\item{\code{R}, a \code{matrix}. List of estimated sample representation.}
-\item{\code{w}, a \code{matrix}. Estimated measurement efficiency. Rows represent dataset, columns represent taxa.}
-\item{\code{meta}, a \code{data.frame}. Meta table without batch ID. Sample features must be present in all datasets. Default is NULL.}
+\item{\code{count}}{ (\code{data.frame}) – The corrected count table.
+Rows represent taxa, and columns represent samples.}
+\item{\code{D}}{ (\code{matrix}) – The estimated shared dictionary.}
+\item{\code{R}}{ (\code{matrix}) – The estimated sample representation.}
+\item{\code{w}}{ (\code{matrix}) – The estimated measurement efficiency.
+Rows represent datasets, and columns represent taxa.}
+\item{\code{meta}}{ (\code{data.frame}) – The meta table used in the covariate balancing step.}
+\item{\code{dist_mat}}{ (\code{matrix}) – The distance matrix measuring taxa dissimilarity.}
 }
 }
 \description{
@@ -80,6 +87,6 @@ then refines the estimation via shared dictionary learning.
 }
 \examples{
  data(exampleData)
- metadict_res = metadict(O, meta, distance_matrix = dist_mat, alpha = 0.01, beta = 0.01)
+ metadict_res = metadict(O, meta, distance_matrix = dist_mat)
 
 }

@@ -7,18 +7,19 @@
 #' @importFrom igraph cluster_louvain
 #' @importFrom igraph cluster_walktrap
 #'
-#' @param X Input data. The rows represent clustering objects, the columns represent features.
+#' @param X Input data.  
+#'   Rows represent clustering objects, and columns represent features.
 #' @param max_k The largest number of connected neighbors.
 #' @param min_k The smallest number of connected neighbors.
-#' @param method Community detection methods such as Louvain and Walktrap.
-#' @param resolution The resolution parameter of Louvain algorithm.
+#' @param method The community detection method to use. Options include `"Louvain"` and `"Walktrap"`.
+#' @param resolution The resolution parameter for the Louvain algorithm.
 #'
-#' @returns a \code{list} with components:
+#' @returns A \code{list} with the following components:
 #' \itemize{
-#' \item{\code{cluster}, the estimated cluster labels.}
-#' \item{\code{graph}, the \code{k}-nearest neighbor graph.}
+#'   \item{\code{cluster}}{ – The estimated cluster labels.}
+#'   \item{\code{graph}}{ – The \code{k}-nearest neighbor graph.}
 #' }
-#'
+#' 
 #' @export
 community_detection <- function(X, max_k = 10, method = "Louvain", resolution=1, min_k = 2){
   avg_silwidth <- numeric()
@@ -61,14 +62,19 @@ cluster_core = function(X,k,resolution,method = "Louvain"){
 #' @importFrom ecodist bcdist
 #' @import ggplot2
 #'
-#' @param X Abundance matrix. The rows represent taxa, the columns represent samples.
+#' @param X Abundance matrix.  
+#'   Rows represent taxa, and columns represent samples.
 #' @param covariate A discrete sample covariate.
-#' @param title Graph title.
-#' @param R2 A logical variable. Whether to show R2 statistic in the subtitle. Default is TRUE.
-#' @param dissimilarity The dissimilarity type, “Bray-Curtis” for Bray-Curtis dissimilarity, “Euclidean” for generalized UniFrac dissimilarity.
-#' @param colorset Color set. Default is \code{Set1}.
-#' @param point_size Point size. Default is 1.
-#'
+#' @param title The title of the graph.
+#' @param R2 A logical variable.  
+#'   Whether to display the R² statistic in the subtitle. Default is \code{TRUE}.
+#' @param dissimilarity The dissimilarity type.  
+#'   Options include:  
+#'   - `"Bray-Curtis"` for Bray-Curtis dissimilarity.  
+#'   - `"Euclidean"` for generalized UniFrac dissimilarity.
+#' @param colorset The color set for visualization. Default is \code{"Set1"}.
+#' @param point_size The size of the points in the plot. Default is \code{1}.
+#' 
 #' @returns a PCoA plot.
 #'
 #' @export
@@ -119,13 +125,17 @@ permanova_pcoa <- function(distP, Y) {
 #' @import ggplot2
 #' @import viridis
 #'
-#' @param X Abundance matrix. The rows represent taxa, the columns represent samples.
+#' @param X Abundance matrix.  
+#'   Rows represent taxa, and columns represent samples.
 #' @param covariate A discrete sample covariate.
-#' @param title Graph title.
-#' @param R2 A logical variable. Whether to show R2 statistic in the subtitle. Default is TRUE.
-#' @param dissimilarity The dissimilarity type, “Bray-Curtis” for Bray-Curtis dissimilarity, 
-#' “Euclidean” for generalized UniFrac dissimilarity.
-#' @param point_size Point size. Default is 1.
+#' @param title The title of the graph.
+#' @param R2 A logical variable.  
+#'   Whether to display the R² statistic in the subtitle. Default is \code{TRUE}.
+#' @param dissimilarity The dissimilarity type to use.  
+#'   Options include:  
+#'   - `"Bray-Curtis"` for Bray-Curtis dissimilarity.  
+#'   - `"Euclidean"` for generalized UniFrac dissimilarity.
+#' @param point_size The size of the points in the plot. Default is \code{1}.
 #' 
 #' @returns a PCoA plot.
 #'

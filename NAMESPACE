@@ -3,6 +3,7 @@
 export(MetaDICT)
 export(community_detection)
 export(data_check)
+export(metadict_add_new_data)
 export(pcoa.plot.continuous)
 export(pcoa.plot.discrete)
 import(ggplot2)

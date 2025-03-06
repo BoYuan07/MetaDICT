@@ -3,23 +3,25 @@ title: "MetaDICT Package Vignette"
 author: 
   - Bo Yuan
 date: '`r format(Sys.Date(), "%B %d, %Y")`'
-output:
-  BiocStyle::html_document:
-    toc: true
-    toc_depth: 2
+output: rmarkdown::html_vignette
 bibliography: bibliography.bib
 vignette: >
   %\VignetteIndexEntry{MetaDICT}
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+  \usepackage[utf8]{inputenc}
 ---
 
-```{r setup, message = FALSE, warning = FALSE, comment = NA, include = FALSE}
+```{r setup, message = FALSE, warning = FALSE, comment = NA, include=FALSE}
 knitr::opts_chunk$set(message = FALSE, warning = FALSE, comment = NA, 
                       fig.width = 6.25, fig.height = 5)
-
+library(tidyverse)
 library(DT)
+options(DT.options = list(
+  initComplete = JS("function(settings, json) {",
+  "$(this.api().table().header()).css({'background-color': 
+  '#000', 'color': '#fff'});","}")))
 ```
+
 
 
 # Introduction
@@ -37,12 +39,15 @@ Compared to existing methods, **MetaDICT minimizes overcorrection** when **unobs
 The package can be downloaded from github:
 
 ```{r,eval=FALSE}
+if (!requireNamespace("devtools", quietly = TRUE))
+    install.packages("devtools")
 devtools::install_github("BoYuan07/MetaDICT", build_vignettes = TRUE)
 ```
 
 Load the package:
 
 ```{r}
+# load the package
 library(MetaDICT)
 ```
 
@@ -53,30 +58,48 @@ library(MetaDICT)
 Example dataset contains two simulated datasets, using gut microbiome data collected by He et al. [@he2018regional]. These two datasets share the same set of taxa, and each dataset contains 200 samples. Load the example sample:
 
 ```{r}
+# load data
 data("exampleData")
 ```
 
-The object contains the following components:  
+The object contains the following components:
 
-- **Integrated count matrix (`O`)** – Merged abundance data from both datasets, which is taxa-by-sample matrix.  
-- **Meta table (`meta`)** – The sample metadata includes information for both datasets. It contains:  `batch` – A column indicating the dataset source (`Dataset1` or `Dataset2`); `Y` – A covariate associated with microbial compositions; `Y2` – An uninformative covariate with no biological relevance. 
-- **Sequence distance matrix (`dist_mat`)** – A distance matrix quantifying relationships between sequences.  
-- **Phylogenetic tree (`tree`)** – Evolutionary relationships among the taxa.  
-- **Taxonomy table (`taxonomy`)** – Hierarchical classification of the taxa.  
+- **Integrated Count Matrix (`O`)**  
+  A merged abundance data matrix (taxa-by-sample) combining both datasets.
+
+- **Meta Table (`meta`)**  
+  The sample metadata, which includes details for both datasets:  
+  - **`batch`** – Indicates the dataset source (`Dataset1` or `Dataset2`).  
+  - **`Y`** – A covariate associated with microbial compositions.  
+  - **`Y2`** – An uninformative covariate with no biological relevance.  
+
+- **Sequence Distance Matrix (`dist_mat`)**  
+  A matrix quantifying the relationships between sequences.
+
+- **Phylogenetic Tree (`tree`)**  
+
+- **Taxonomy Table (`taxonomy`)**  
+
 
 We will use this example data to illustrate how to use MetaDICT.
 
 Significant batch effects are observed between these two datasets on PCoA plots.
 
 ```{r}
+# batch label
 batchid = meta$batch
+
+# PCoA plot
 pcoa.plot.discrete(O,batchid,"Batch")
 ```
 
 The PCoA plots of target variable `Y`:
 
 ```{r}
+# sample covariate
 Y = meta$Y
+
+# PCoA plot
 pcoa.plot.discrete(O,Y,"Sample", colorset = "Set2")
 ```
 
@@ -87,17 +110,9 @@ pcoa.plot.discrete(O,Y,"Sample", colorset = "Set2")
 We apply MetaDICT to remove batch effects and integrate these two datasets. MetaDICT requires three inputs: integrated count table, integrated meta table, and taxa dissimilarity matrix used for measurement efficiency (batch effect) estimation. A taxa dissimilarity matrix can directly be used in MetaDICT:
 
 ```{r}
+# main function of MetaDICT
 metadict_res = MetaDICT(O, meta, distance_matrix = dist_mat)
-```
 
-The results from MetaDICT includes: 
-1) corrected count table $X$; 
-2) the estimated shared dictionary $D$; 
-3) the estimated sample representation $R$;  
-4) the estimated measurement efficiency $w$; 
-5) integrated meta table.
-
-```{r}
 X = metadict_res$count
 D = metadict_res$D
 R_list = metadict_res$R
@@ -105,13 +120,23 @@ w = metadict_res$w
 meta_output = metadict_res$meta
 ```
 
+The results from **MetaDICT** include:
+
+1. **Corrected Count Table (`X`)** – The adjusted abundance matrix after integration.
+2. **Estimated Shared Dictionary (`D`)** – The learned dictionary representing shared features across datasets.
+3. **Estimated Sample Representation (`R`)** – The latent factor representation of samples.
+4. **Estimated Measurement Efficiency (`w`)** – The scaling factors capturing dataset-specific measurement variations.
+5. **Integrated Meta Table** – The combined metadata containing information from all integrated datasets.
+
+
+
 Batch effect is significantly reduced using MetaDICT:
 
 ```{r}
+# PCoA plot of batch variable
 pcoa.plot.discrete(X,batchid,"Batch")
-```
 
-```{r}
+# PCoA plot of sample covariate
 pcoa.plot.discrete(X,Y,"Sample",colorset = "Set2")
 ```
 
@@ -124,10 +149,10 @@ X1 = metadict_res1$count
 ```
 
 ```{r}
+# PCoA plot of batch variable
 pcoa.plot.discrete(X1,batchid,"Batch")
-```
 
-```{r}
+# PCoA plot of sample covariate
 pcoa.plot.discrete(X1,Y,"Sample",colorset = "Set2")
 ```
 
@@ -138,12 +163,13 @@ metadict_res2 = MetaDICT(O, meta, taxonomy = taxonomy, tax_level = "order")
 X2 = metadict_res2$count
 ```
 ```{r}
+# PCoA plot of batch variable
 pcoa.plot.discrete(X2,batchid,"Batch")
-```
 
-```{r}
+# PCoA plot of sample covariate
 pcoa.plot.discrete(X2,Y,"Sample",colorset = "Set2")
 ```
+
 
 
 Users can specify the covariates that should be included in MetaDICT using `covariates`. In this example, we only use   `Y2` in the covariate balancing step. MetaDICT is able to preserve the biological variation of `Y` even when `Y` is not observed.
@@ -154,10 +180,10 @@ metadict_res3 = MetaDICT(O,meta,covariates = c("Y2"),
 X3 = metadict_res3$count
 ```
 ```{r}
+# PCoA plot of batch variable
 pcoa.plot.discrete(X3,batchid,"Batch")
-```
 
-```{r}
+# PCoA plot of sample covariate
 pcoa.plot.discrete(X3,Y,"Sample",colorset = "Set2")
 ```
 
@@ -168,6 +194,54 @@ MetaDICT includes two predefined parameters $\alpha$ and $\beta$. The parameter 
 metadict_res4 = MetaDICT(O,meta,distance_matrix = dist_mat,
                          customize_parameter = TRUE, alpha = 0.01, beta = 0.1)
 ```
+
+## Add new datasets to an existing integrated study
+
+In certain situations, new studies may become available after multiple datasets have already been integrated and a machine learning model has been trained on the combined data. To incorporate these new studies into the existing integrated dataset, use the following function:
+
+
+```{r}
+# load the data
+data("exampleData_transfer")
+
+# add new dataset to previous result
+new_data_res = metadict_add_new_data(new_data, new_meta, metadict_res)
+
+# corrected count
+new_count = new_data_res$count
+
+# integrate count tables
+all_count_raw = cbind(O,new_data)
+all_count_corrected = cbind(X,new_count)
+all_meta = rbind(meta,new_meta)
+```
+
+
+Before batch correction:
+
+```{r}
+# PCoA plot of batch variable
+pcoa.plot.discrete(all_count_raw,all_meta$batch,"Batch")
+
+# PCoA plot of sample covariate
+pcoa.plot.discrete(all_count_raw,all_meta$Y,"Sample",colorset = "Set2")
+```
+
+After batch correction:
+
+
+```{r}
+# PCoA plot of batch variable
+pcoa.plot.discrete(all_count_corrected,all_meta$batch,"Batch")
+
+# PCoA plot of sample covariate
+pcoa.plot.discrete(all_count_corrected,all_meta$Y,"Sample",colorset = "Set2")
+```
+
+
+The corrected data `new_count` can be directly applied to pre-trained machine learning model.
+
+
 
 
 ## Community detection
@@ -185,7 +259,7 @@ Shared dictionary `D` can be used in taxa community detection. The number of col
 
 ```{r}
 D = metadict_res4$D
-plot(diag(t(D)%*%(D)))
+plot(diag(t(D)%*%(D)), ylab = "Column-wise Squared Norm")
 ```
 
 The elbow value is around 20. We apply community detection method:

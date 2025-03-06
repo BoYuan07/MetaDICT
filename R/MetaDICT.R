@@ -10,48 +10,53 @@
 #' @importFrom stats optim
 #' @importFrom edgeR calcNormFactors
 #'
-#' @param count The integrated count table of taxa by samples. The
-#' \code{count} parameter should be provided as either a \code{matrix} or a
-#' \code{data.frame}.
-#' @param meta The integrated meta table \code{meta} contains sample information
-#' and batch id.
-#' @param covariates The covariates used in data integration. Default is all.
-#' @param tree The phylogenetic tree (optional if distance matrix or taxonomy is provided).
-#' @param taxonomy The taxonomy table (optional if distance matrix or phylogenetic tree is provided).
-#' @param distance_matrix The \code{matrix} that measures the dismilarity of taxa. Default is NULL and MetaDICT generates
-#' distance matrix based on phylogenetic tree and taxonomic information. 
-#' @param tax_level The taxonomic level of count table.
-#' @param customize_parameter A logical variable. TRUE if the parameters of alpha and beta 
-#' are customized. FALSE if the parameters are determined by MetaDICT based on the number
-#' of covariates provided.
-#' @param alpha This parameter is related to the rank of the final corrected count table. 
-#' A larger alpha leads to a lower rank of shared dictionary.
-#' @param beta This parameter is related to the smoothness of the estimated measurement efficiency. 
-#' A larger beta results in more similar measurement efficiency across taxa.
-#' @param normalization Normalization method. Upper quantile or RSim. Set to be NULL if 
-#' normalization is not needed.
-#' @param max_iter Maximum number of iterations for the optimization process. Default is 10000.
-#' @param verbose A logical variable. Wheter to generate verbose output. Default is TRUE.
-#' @param optim_trace A logical variable. Whether to print the optimization step. Default is FALSE.
+#' @param count The integrated count table (taxa-by-sample matrix).  
+#'   Should be provided as either a \code{matrix} or a \code{data.frame}.
+#' @param meta The integrated meta table containing sample information  
+#'   and batch IDs.
+#' @param covariates The covariates used in data integration. Default is `"all"`.
+#' @param tree The phylogenetic tree (optional if a distance matrix or taxonomy is provided).
+#' @param taxonomy The taxonomy table (optional if a distance matrix or phylogenetic tree is provided).
+#' @param distance_matrix A \code{matrix} measuring the dissimilarity of taxa.  
+#'   Default is \code{NULL}, in which case MetaDICT generates a distance matrix  
+#'   based on phylogenetic and taxonomic information.
+#' @param tax_level The taxonomic level of the count table.
+#' @param customize_parameter A logical variable. Set to \code{TRUE} if the  
+#'   \code{alpha} and \code{beta} parameters are customized. If \code{FALSE},  
+#'   MetaDICT determines these parameters based on the number of covariates.
+#' @param alpha A parameter controlling the rank of the final corrected count table.  
+#'   A larger \code{alpha} leads to a lower-rank shared dictionary.
+#' @param beta A parameter controlling the smoothness of the estimated measurement efficiency.  
+#'   A larger \code{beta} results in more similar measurement efficiencies across taxa.
+#' @param normalization The normalization method. Options are `"Upper quantile"`, `"RSim"` or `"TSS"`.  
+#'   Set to \code{NULL} if normalization is not needed.
+#' @param max_iter The maximum number of iterations for the optimization process. Default is \code{10000}.
+#' @param imputation A logical variable. Whether to allow MetaDICT to perform imputation  
+#'   based on dictionary learning results. Default is \code{FALSE}.
+#' @param verbose A logical variable. Whether to generate verbose output. Default is \code{TRUE}.
+#' @param optim_trace A logical variable. Whether to print optimization steps. Default is \code{FALSE}.
 #'
-#' @returns a \code{list} with components:
+#' @returns A \code{list} with the following components:
 #' \itemize{
-#' \item{\code{count}, a \code{data.frame}. Corrected count table. Rows represent taxa. Columns represent samples.}
-#' \item{\code{D}, a \code{matrix}. Estimated shared dictionary.}
-#' \item{\code{R}, a \code{matrix}. List of estimated sample representation.}
-#' \item{\code{w}, a \code{matrix}. Estimated measurement efficiency. Rows represent dataset, columns represent taxa.}
-#' \item{\code{meta}, a \code{data.frame}. Meta table without batch ID. Sample features must be present in all datasets. Default is NULL.}
+#'   \item{\code{count}}{ (\code{data.frame}) – The corrected count table.  
+#'     Rows represent taxa, and columns represent samples.}
+#'   \item{\code{D}}{ (\code{matrix}) – The estimated shared dictionary.}
+#'   \item{\code{R}}{ (\code{matrix}) – The estimated sample representation.}
+#'   \item{\code{w}}{ (\code{matrix}) – The estimated measurement efficiency.  
+#'     Rows represent datasets, and columns represent taxa.}
+#'   \item{\code{meta}}{ (\code{data.frame}) – The meta table used in the covariate balancing step.}
+#'   \item{\code{dist_mat}}{ (\code{matrix}) – The distance matrix measuring taxa dissimilarity.}
 #' }
 #'
 #' @examples 
 #'  data(exampleData)
-#'  metadict_res = metadict(O, meta, distance_matrix = dist_mat, alpha = 0.01, beta = 0.01)
+#'  metadict_res = metadict(O, meta, distance_matrix = dist_mat)
 #' 
 #' @export
 #' 
 MetaDICT <- function(count, meta, covariates = "all", tree = NULL, taxonomy = NULL, distance_matrix = NULL,
 tax_level = NULL, customize_parameter = FALSE, alpha = 0.1, beta = 0.01,  
-normalization = "uq", max_iter = 10000, verbose = TRUE, optim_trace = FALSE){
+normalization = "uq", max_iter = 10000, imputation = FALSE, verbose = TRUE, optim_trace = FALSE){
 
     # convert input to required format of MetaDICT
     metadict_input <- data_check(count = count, meta = meta, covariates = covariates, tree = tree, 
@@ -94,6 +99,8 @@ normalization = "uq", max_iter = 10000, verbose = TRUE, optim_trace = FALSE){
         O_norm <- lapply(O.list,function(x)uq(x)$P)
     }else if(normalization == "rsim"){
         O_norm <- lapply(O.list,function(x)rsim(x)$P)
+    }else if(normalization == "tss"){
+        O_norm <- lapply(O.list,function(x)tss(x))
     }else if(!normalization){
         O_norm <- O.list
     }
@@ -154,13 +161,15 @@ normalization = "uq", max_iter = 10000, verbose = TRUE, optim_trace = FALSE){
 
     # corrected count table
     X <- do.call(cbind,X_list)
-    X[O==0] <- 0
+    X[X<0] <- 0
+
+    if (!imputation){
+        X[O==0] <- 0
+    }
 
     effective_r <- effective_rank(D)
-    error_each <- lapply(1:length(O_norm), function(i)O_norm[[i]]-diag(w_list[i,])%*%X_list[[i]])
-    error_all <- do.call(cbind,error_each)
-    O_all <- do.call(cbind,O_norm)
-    relative_error <- (norm(error_all, "F")^2) / (norm(O_all, "F")^2)
+
+    error_each <- sapply(1:length(O_norm), function(i) norm(O_norm[[i]]-diag(w_list[i,])%*%X_list[[i]], "F")^2/norm(O_norm[[i]],"F")^2)
 
 
     if(optim.res$convergence==0){
@@ -169,7 +178,7 @@ normalization = "uq", max_iter = 10000, verbose = TRUE, optim_trace = FALSE){
     if(optim.res$convergence==1){
         message("The iteration limit max_iter has been reached. Please consider increasing max_iter.")
     }
-    message(paste("Relative error:", relative_error, "\n", "Effective rank of D", effective_r))
+    message(paste("Maximum relative error:", max(error_each), "\n", "Effective rank of D", effective_r))
 
     if (verbose){
         message("Finished.")
@@ -178,7 +187,7 @@ normalization = "uq", max_iter = 10000, verbose = TRUE, optim_trace = FALSE){
     res.metadict <- as.data.frame(X)
     colnames(res.metadict) <- colnames(count)
     rownames(res.metadict) <- rownames(count)
-    return(list(count = res.metadict, D = D_rot, R = R_list_rot, w = w_list, meta = meta_filtered))
+    return(list(count = res.metadict, D = D_rot, R = R_list_rot, w = w_list, meta = meta_filtered, dist_mat = dist_mat))
 }
 
 #=================covariate balancing step===================#
@@ -359,4 +368,8 @@ rsim <- function(X,eta=0.1){
   return(list('P' = cn.res, 'I0' = ref, 'pi0'= pi, 'sf'=f.cn))
 }
 
+# TSS
+tss <- function(X){
+    return(t(t(X)/colSums(X)))
+}
 

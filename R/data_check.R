@@ -101,7 +101,7 @@ data_check <- function(count, meta, covariates = "all", distance_matrix = NULL, 
         stop("The metadata table does not contain 'batch' column.")
     }
     batchid <- meta[['batch']]
-    if (is.character(covariates) && covariates == "all") {
+    if (length(covariates) == 1 && covariates == "all") {
     meta_filtered <- meta[, !colnames(meta) %in% "batch", drop = FALSE]
     } else if (is.vector(covariates)) {
         # Ensure all covariates exist in meta
