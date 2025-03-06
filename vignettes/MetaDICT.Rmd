@@ -6,7 +6,7 @@ date: '`r format(Sys.Date(), "%B %d, %Y")`'
 output: rmarkdown::html_vignette
 bibliography: bibliography.bib
 vignette: >
-  %\VignetteIndexEntry{MetaDICT}
+  %\VignetteIndexEntry{MetaDICT Package Vignette}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
@@ -29,7 +29,9 @@ options(DT.options = list(
 MetaDICT is a computational method designed for the **integration of microbiome datasets**, effectively addressing **batch effects** while preserving **biological variation** across heterogeneous datasets.  
 
 The method operates in **two stages**:
+
 1. **Initial Batch Effect Estimation** – Utilizes **covariate balancing** to estimate batch effects, which are defined as **heterogeneous sequencing efficiency** across datasets.
+
 2. **Refinement via Shared Dictionary Learning** – Further refines batch effect estimation by leveraging shared structures across datasets.  
 
 Compared to existing methods, **MetaDICT minimizes overcorrection** when **unobserved confounding variables** are present, ensuring a more reliable integration of datasets. The resulting integrated data can be applied to **downstream analyses**, including **Principal Coordinates Analysis (PCoA)**, **taxa/sample community detection**, and **differential abundance testing**.
