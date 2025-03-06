@@ -26,7 +26,7 @@ options(DT.options = list(
 
 # Introduction
 
-MetaDICT is a computational method designed for the **integration of microbiome datasets**, effectively addressing **batch effects** while preserving **biological variation** across heterogeneous datasets.  
+MetaDICT is a computational method designed for the **integration of microbiome datasets**, effectively addressing **batch effects** while preserving **biological variation** across heterogeneous datasets. 
 
 The method operates in **two stages**:
 
@@ -34,7 +34,7 @@ The method operates in **two stages**:
 
 2. **Refinement via Shared Dictionary Learning** – Further refines batch effect estimation by leveraging shared structures across datasets.  
 
-Compared to existing methods, **MetaDICT minimizes overcorrection** when **unobserved confounding variables** are present, ensuring a more reliable integration of datasets. The resulting integrated data can be applied to **downstream analyses**, including **Principal Coordinates Analysis (PCoA)**, **taxa/sample community detection**, and **differential abundance testing**.
+Compared to existing methods, **MetaDICT minimizes overcorrection** when **unobserved confounding variables** are present, ensuring a more reliable integration of datasets. The resulting integrated data can be applied to **downstream analyses**, including **Principal Coordinates Analysis (PCoA)**, **taxa/sample community detection**, and **differential abundance test**. For more details, please refer to the MetaDICT paper [@yuan2024microbiome].
 
 # Installation
 
