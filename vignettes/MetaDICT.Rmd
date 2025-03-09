@@ -1,12 +1,12 @@
 ---
-title: "MetaDICT Package Vignette"
+title: "MetaDICT Tutorial"
 author: 
   - Bo Yuan
 date: '`r format(Sys.Date(), "%B %d, %Y")`'
 output: rmarkdown::html_vignette
 bibliography: bibliography.bib
 vignette: >
-  %\VignetteIndexEntry{MetaDICT Package Vignette}
+  %\VignetteIndexEntry{MetaDICT Tutorial}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
@@ -53,9 +53,9 @@ Load the package:
 library(MetaDICT)
 ```
 
-# Implementation of MetaDICT
+# Run MetaDICT on a simulated dataset
 
-## Example data
+## Example dataset
 
 Example dataset contains two simulated datasets, using gut microbiome data collected by He et al. [@he2018regional]. These two datasets share the same set of taxa, and each dataset contains 200 samples. Load the example sample:
 
@@ -105,9 +105,8 @@ Y = meta$Y
 pcoa.plot.discrete(O,Y,"Sample", colorset = "Set2")
 ```
 
-# Implementation of MetaDICT package
 
-## Data integration
+## Run MetaDICT function with taxa dissimilarity matrix
 
 We apply MetaDICT to remove batch effects and integrate these two datasets. MetaDICT requires three inputs: integrated count table, integrated meta table, and taxa dissimilarity matrix used for measurement efficiency (batch effect) estimation. A taxa dissimilarity matrix can directly be used in MetaDICT:
 
@@ -142,6 +141,7 @@ pcoa.plot.discrete(X,batchid,"Batch")
 pcoa.plot.discrete(X,Y,"Sample",colorset = "Set2")
 ```
 
+## Run MetaDICT with the phylogenetic tree
 
 MetaDICT can also accept a phylogenetic tree as input and uses phylogenetic information to estimate taxa similarity:
 
@@ -158,6 +158,9 @@ pcoa.plot.discrete(X1,batchid,"Batch")
 pcoa.plot.discrete(X1,Y,"Sample",colorset = "Set2")
 ```
 
+## Run MetaDICT with the taxonomy information
+
+
 If phylogenetic tree is not available, MetaDICT can use taxonomic information to estimate taxa similarity. In this case, the taxonomy level of the count table must be specified.
 
 ```{r}
@@ -172,7 +175,7 @@ pcoa.plot.discrete(X2,batchid,"Batch")
 pcoa.plot.discrete(X2,Y,"Sample",colorset = "Set2")
 ```
 
-
+## Run MetaDICT with the specified covariate
 
 Users can specify the covariates that should be included in MetaDICT using `covariates`. In this example, we only use   `Y2` in the covariate balancing step. MetaDICT is able to preserve the biological variation of `Y` even when `Y` is not observed.
 
@@ -189,6 +192,7 @@ pcoa.plot.discrete(X3,batchid,"Batch")
 pcoa.plot.discrete(X3,Y,"Sample",colorset = "Set2")
 ```
 
+## Run MetaDICT with customized parameters
 
 MetaDICT includes two predefined parameters $\alpha$ and $\beta$. The parameter $\alpha$ enforces the low-rank structure of shared dictionary. The parameter $\beta$ enforces the smoothness of estimated measurement efficiency. If `customize_parameter = FALSE`, MetaDICT automatically selects parameters based on the provided inputs. When `customize_parameter = TRUE`, users can manually set parameter values to customize the analysis.
 
@@ -197,10 +201,9 @@ metadict_res4 = MetaDICT(O,meta,distance_matrix = dist_mat,
                          customize_parameter = TRUE, alpha = 0.01, beta = 0.1)
 ```
 
-## Add new datasets to an existing integrated study
+# Add new datasets to an existing integrated study
 
 In certain situations, new studies may become available after multiple datasets have already been integrated and a machine learning model has been trained on the combined data. To incorporate these new studies into the existing integrated dataset, use the following function:
-
 
 ```{r}
 # load the data
@@ -213,9 +216,10 @@ new_data_res = metadict_add_new_data(new_data, new_meta, metadict_res)
 new_count = new_data_res$count
 
 # integrate count tables
-all_count_raw = cbind(O,new_data)
+all_count_raw = cbind(X,new_data)
 all_count_corrected = cbind(X,new_count)
-all_meta = rbind(meta,new_meta)
+covariates <- intersect(colnames(meta), colnames(new_meta))
+all_meta = rbind(meta[,covariates, drop = FALSE],new_meta[,covariates, drop = FALSE])
 ```
 
 
@@ -246,7 +250,7 @@ The corrected data `new_count` can be directly applied to pre-trained machine le
 
 
 
-## Community detection
+# Community detection
 
 We can detect taxa communities and sample subpopulation using the output of MetaDICT. 
 

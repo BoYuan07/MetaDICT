@@ -60,6 +60,7 @@ normalization = "uq", max_iter = 10000, imputation = FALSE, verbose = TRUE, opti
     r <- ncol(D)
 
     covariates <- intersect(colnames(meta_old), colnames(newmeta))
+    meta_filtered <- meta_old[, covariates, drop = FALSE]
 
    # convert input to required format of MetaDICT
     metadict_input <- data_check(count = newdata, meta = newmeta, covariates = covariates,  
@@ -71,7 +72,7 @@ normalization = "uq", max_iter = 10000, imputation = FALSE, verbose = TRUE, opti
     controls <- metadict_input$controls
     neighbor <- controls$neighbor
     sigma <- controls$sigma
-    r <- ncol(D)
+
     m <- length(O.list)
     d <- nrow(dist_mat)
     gamma <- 1
@@ -109,7 +110,7 @@ normalization = "uq", max_iter = 10000, imputation = FALSE, verbose = TRUE, opti
     }
 
     O_all.list <- append(O_norm, list(O_old), after = 0)
-    meta_all.list <- append(meta.list, list(meta_old), after =  0)
+    meta_all.list <- append(meta.list, list(meta_filtered), after =  0)
 
 
     # Laplacian matrix of sequencing graph
@@ -128,7 +129,7 @@ normalization = "uq", max_iter = 10000, imputation = FALSE, verbose = TRUE, opti
     R_list <- initial$R
 
     sample_num <- sapply(O_norm,ncol)
-    x0 <- convert_to_vec_transfer(m, w, R_list)
+    x0 <- convert_to_vec_transfer(m, w_list, R_list)
 
     lower <- c(rep(0,m*d),rep(-Inf,r*sum(sample_num)))
     upper <- c(rep(1,m*d),rep(Inf,r*sum(sample_num)))
