@@ -2,8 +2,9 @@
 
 ## Contents
 
-[Installation](##Installation)
-[Demo](##Demo)
+[Installation](## Installation)
+
+[Demo](## Demo)
 
 
 ## Overview:
