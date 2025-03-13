@@ -2,9 +2,9 @@
 
 ## Contents
 
-[Installation](## Installation)
+[Installation](#Installation)
 
-[Demo](## Demo)
+[Demo](#Demo)
 
 
 ## Overview:
@@ -34,14 +34,14 @@ The package should take approximately 223 seconds to install with vignette.
 
 
 
-## Demo
+## Demo:
 
 A demo dataset is included in the package. The tutorial can be found in the vignette:
 
 ```
 vignette("MetaDICT")
 ```
-The approximated running time of MetaDICT on the demo dataset is 65 seconds.
+The estimated running time of MetaDICT on the demo dataset is approximately 65 seconds.
 
 # Reference
 
