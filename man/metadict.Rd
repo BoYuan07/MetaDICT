@@ -27,13 +27,13 @@ MetaDICT(
 Should be provided as either a \code{matrix} or a \code{data.frame}.}
 
 \item{meta}{The integrated meta table containing sample information
-and batch IDs.}
+and batch IDs. The data must include a column named 'batch' containing all batch IDs. The row names of the meta should match the sample names in the count table.}
 
 \item{covariates}{The covariates used in data integration. Default is \code{"all"}.}
 
 \item{tree}{The phylogenetic tree (optional if a distance matrix or taxonomy is provided).}
 
-\item{taxonomy}{The taxonomy table (optional if a distance matrix or phylogenetic tree is provided).}
+\item{taxonomy}{The taxonomy table (optional if a distance matrix or phylogenetic tree is provided). The row names of the taxonomy table should match the taxa names in the count table.}
 
 \item{distance_matrix}{A \code{matrix} measuring the dissimilarity of taxa.
 Default is \code{NULL}, in which case MetaDICT generates a distance matrix

@@ -7,7 +7,7 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
-Imports: stats, RANN, igraph, vegan, edgeR, ecodist, ggplot2, viridis
+Imports: stats, RANN, igraph, vegan, edgeR, ecodist, ggplot2, viridis, ggpubr
 BugReports: https://github.com/BoYuan07/MetaDICT/issues
 URL: https://github.com/BoYuan07/MetaDICT
 Suggests: 

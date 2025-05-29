@@ -68,7 +68,7 @@ data_check <- function(count, meta, covariates = "all", distance_matrix = NULL, 
         "A taxonomy table is provided. Sequencing similarity will be 
         estimated using taxonomic information."
         if (!all(taxa_name %in% rownames(taxonomy))){
-            stop("Taxa names do not match between count table and taxonomy table.")
+            stop("Row names do not match between count table and taxonomy table. Please ensure that all taxa appearing in the count table are present in the row names of the taxonomy table.")
         }
         if (!(tax_level %in% colnames(taxonomy))){
             stop("The provided taxonomy level does not match with colnames of taxonomy.")
@@ -78,7 +78,7 @@ data_check <- function(count, meta, covariates = "all", distance_matrix = NULL, 
 
         # generate adjacency matrix
         adj_mat <- matrix(0, nrow = length(taxa_name), ncol = length(taxa_name))
-        taxonomy_subset <- taxonomy[taxa_name, 1:(col_index-1)]  # Extract columns before col_index
+        taxonomy_subset <- taxonomy[taxa_name, 1:(col_index-1), drop = FALSE]  # Extract columns before col_index
         adj_mat <- as.matrix(
             outer(1:length(taxa_name), 1:length(taxa_name), 
             Vectorize(function(i, j) as.numeric(all(taxonomy_subset[i, ] == taxonomy_subset[j, ])))

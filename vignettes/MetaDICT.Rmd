@@ -105,6 +105,15 @@ Y = meta$Y
 pcoa.plot.discrete(O,Y,"Sample", colorset = "Set2")
 ```
 
+## Check the singular values of each dataset
+
+A crucial assumption in MetaDICT is that the microbial load matrix can be approximated by a product of two matrices, one of which is shared dictionary. A simple diagnostic tool for such an assumption is to evaluate the singular values of the sequencing count matrix in each study and see how fast the singular values decay:
+
+```{r}
+plot_singular_values(O, meta)
+```
+
+
 
 ## Run MetaDICT function with taxa dissimilarity matrix
 
