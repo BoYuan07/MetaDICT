@@ -39,3 +39,10 @@ a PCoA plot.
 \description{
 PCoA plots for continuous variables.
 }
+\examples{
+ data(exampleData)
+ O = exampleData$O
+ Y = runif(ncol(O))
+ pcoa.plot.continuous(O,Y,"Y")
+
+}

@@ -1,4 +1,4 @@
-utils::globalVariables(c("Y", "Sample", "colorset"))
+utils::globalVariables(c("Y", "Sample", "colorset", "Signal"))
 
 #' @title Taxa/Sample Community detection.
 #'
@@ -19,6 +19,16 @@ utils::globalVariables(c("Y", "Sample", "colorset"))
 #' @returns A \code{list} with the following components:
 #'   \item{\code{cluster}}{ – The estimated cluster labels.}
 #'   \item{\code{graph}}{ – The \code{k}-nearest neighbor graph.}
+#'
+#' @examples 
+#'  data(exampleData)
+#'  O = exampleData$O
+#'  meta = exampleData$meta
+#'  dist_mat = exampleData$dist_mat
+#'  metadict_res = MetaDICT(O, meta, distance_matrix = dist_mat)
+#'  D = metadict_res$D
+#'  D_filter = D[,1:20]
+#'  taxa_c = community_detection(D_filter, max_k = 5)
 #' 
 #' @export
 community_detection <- function(X, max_k = 10, method = "Louvain", resolution=1, min_k = 2){
@@ -37,7 +47,7 @@ community_detection <- function(X, max_k = 10, method = "Louvain", resolution=1,
   return(list("cluster" = clustring, "graph" = best_res$graph))
 }
 
-cluster_core = function(X,k,resolution,method = "Louvain"){
+cluster_core <- function(X,k,resolution,method = "Louvain"){
     knn.info <- RANN::nn2(X, k=k)
     knn <- knn.info$nn.idx
     adj <- matrix(0, nrow(X), nrow(X))
@@ -75,18 +85,25 @@ cluster_core = function(X,k,resolution,method = "Louvain"){
 #'   - `"Euclidean"` for generalized UniFrac dissimilarity.
 #' @param colorset The color set for visualization. Default is \code{"Set1"}.
 #' @param point_size The size of the points in the plot. Default is \code{1}.
-#' 
+#'
+#' @examples
+#'  data(exampleData)
+#'  O = exampleData$O
+#'  meta = exampleData$meta
+#'  batchid = meta$batch
+#'  pcoa.plot.discrete(O,batchid,"Batch")
+#'
 #' @returns a PCoA plot.
 #'
 #' @export
-pcoa.plot.discrete = function(X, covariate, title, R2 = TRUE, dissimilarity = "Bray-Curtis", colorset = "Set1",point_size = 1){
+pcoa.plot.discrete <- function(X, covariate, title, R2 = TRUE, dissimilarity = "Bray-Curtis", colorset = "Set1",point_size = 1){
   if(dissimilarity == "Bray-Curtis"){
      dist_matrix <- bcdist(t(X))
   }else if(dissimilarity == "Euclidean"){
     dist_matrix <- dist(t(X),method = "euclidean")
   }
  
-  mds.stuff <- cmdscale(dist_matrix, eig=T, x.ret=T)
+  mds.stuff <- cmdscale(dist_matrix, eig=TRUE, x.ret=TRUE)
   mds.var.per <- round(mds.stuff$eig/sum(mds.stuff$eig)*100,1)
   mds.values <- mds.stuff$points
   mds.data <- data.frame(X=mds.values[,1],
@@ -114,8 +131,8 @@ pcoa.plot.discrete = function(X, covariate, title, R2 = TRUE, dissimilarity = "B
 }
 
 permanova_pcoa <- function(distP, Y) {
-  df.Y = as.data.frame(Y)
-  Re = adonis2(distP~Y, data = df.Y)
+  df.Y <- as.data.frame(Y)
+  Re <- adonis2(distP~Y, data = df.Y)
   return(Re$R2[1])
 }
 
@@ -139,30 +156,35 @@ permanova_pcoa <- function(distP, Y) {
 #'   - `"Euclidean"` for generalized UniFrac dissimilarity.
 #' @param point_size The size of the points in the plot. Default is \code{1}.
 #' 
+#' @examples
+#'  data(exampleData)
+#'  O = exampleData$O
+#'  Y = runif(ncol(O))
+#'  pcoa.plot.continuous(O,Y,"Y")
+#'
 #' @returns a PCoA plot.
 #'
 #' @export
-pcoa.plot.continuous = function(X, covariate, title, R2 = TRUE, dissimilarity = "Bray-Curtis", point_size = 1){
+pcoa.plot.continuous <- function(X, covariate, title, R2 = TRUE, dissimilarity = "Bray-Curtis", point_size = 1){
   if(dissimilarity == "Bray-Curtis"){
      dist_matrix <- bcdist(t(X))
   }else if(dissimilarity == "Euclidean"){
     dist_matrix <- dist(t(X),method = "euclidean")
   }
-  mds.stuff <- cmdscale(dist_matrix, eig=T, x.ret=T)
+  mds.stuff <- cmdscale(dist_matrix, eig=TRUE, x.ret=TRUE)
   mds.var.per <- round(mds.stuff$eig/sum(mds.stuff$eig)*100,1)
   mds.values <- mds.stuff$points
   mds.data <- data.frame(X=mds.values[,1],
                          Y=mds.values[,2],
                          Signal = covariate)
 
-  p <- ggplot(data=mds.data, aes(x=X, y=Y,color=Sample))+
+  p <- ggplot(data=mds.data, aes(x=X, y=Y,color=Signal))+
       geom_point(size=point_size)+
       scale_colour_gradientn(colors = viridis(10))+
       xlab(paste("PCoA1 -", mds.var.per[1], '%', sep=""))+
       ylab(paste("PCoA2 -", mds.var.per[2], '%', sep=""))+
       labs(title = title)+
       theme_bw()+
-      scale_color_brewer(palette=colorset)+
       theme(legend.key.height=unit(0.5,"cm"),
           legend.title = element_text(size = 14),  
           legend.text  = element_text(size = 12),

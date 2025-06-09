@@ -16,6 +16,12 @@ utils::globalVariables(c("taxon", "value"))
 #'  
 #' @return A list of ggplot objects displaying the singular values for each dataset.
 #' 
+#' @examples 
+#'  data(exampleData)
+#'  O = exampleData$O
+#'  meta = exampleData$meta
+#'  plot_singular_values(O, meta)
+#'
 #' @export 
 #' 
 plot_singular_values <- function(count, meta){
@@ -27,7 +33,7 @@ plot_singular_values <- function(count, meta){
         stop("The metadata table does not contain 'batch' column.")
     }
     batchid <- meta[['batch']]
-    batch_name = unique(batchid)
+    batch_name <- unique(batchid)
 
     # Create a list of sample IDs for each batch
     sample_list <- lapply(batch_name, function(x) {

@@ -42,3 +42,11 @@ a PCoA plot.
 \description{
 PCoA plots for discrete variables.
 }
+\examples{
+ data(exampleData)
+ O = exampleData$O
+ meta = exampleData$meta
+ batchid = meta$batch
+ pcoa.plot.discrete(O,batchid,"Batch")
+
+}

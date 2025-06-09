@@ -44,6 +44,17 @@
 #'   \item{\code{meta}}{ (\code{data.frame}) – The meta table used in the covariate balancing step.}
 #'   \item{\code{dist_mat}}{ (\code{matrix}) – The distance matrix measuring taxa dissimilarity.}
 #' 
+#' @examples 
+#'  data(exampleData)
+#'  O = exampleData$O
+#'  meta = exampleData$meta
+#'  dist_mat = exampleData$dist_mat
+#'  metadict_res = MetaDICT(O, meta, distance_matrix = dist_mat)
+#'  data("exampleData_transfer")
+#'  new_data = exampleData_transfer$new_data
+#'  new_meta = exampleData_transfer$new_meta
+#'  new_data_res = metadict_add_new_data(new_data, new_meta, metadict_res)
+#'
 #' @export
 #' 
 
@@ -75,14 +86,15 @@ normalization = "uq", max_iter = 10000, imputation = FALSE, verbose = TRUE, opti
     d <- nrow(dist_mat)
     gamma <- 1
     O <- do.call(cbind, O.list)
-    sample_num <- sapply(O.list,ncol)
+    sample_num <- vapply(O.list, ncol, integer(1))
+
 
     if (!customize_parameter){
         alpha <- 0.001
         beta <- controls$beta
     }
     if (verbose){
-        message(paste("Paremeters are set to be", "alpha = ", alpha, "beta = ", beta))
+        message(sprintf("Parameters are set to be: alpha = %f, beta = %f", alpha, beta))
     }
 
     # normalization
@@ -90,11 +102,10 @@ normalization = "uq", max_iter = 10000, imputation = FALSE, verbose = TRUE, opti
         if (is.null(normalization)){
             message("Normalization is skipped.")
         }else if (! normalization %in% c("uq", "rsim")){
-            stop(paste("Normalization method is not supported by MetaDICT!",
-            "Please run normalization first then used the normalized counts as input while
-            set Normalization = FALSE.", sep = "\n"))
+            stop(sprintf("Normalization method is not supported by MetaDICT!\nPlease run normalization first, then use the normalized counts as input while setting Normalization = FALSE."))
+
         }else{
-            message(paste("Normalization starts with method", normalization))  
+            message(sprintf("Normalization starts with method %s", normalization)) 
         }
     }
     if(normalization == "uq"){
@@ -114,7 +125,7 @@ normalization = "uq", max_iter = 10000, imputation = FALSE, verbose = TRUE, opti
     # Laplacian matrix of sequencing graph
     adj_mat <- matrix(0,d,d)
     for(i in 1:d){
-        idx <- order(dist_mat[i,],decreasing = F)[2:(neighbor+1)]
+        idx <- order(dist_mat[i,],decreasing = FALSE)[2:(neighbor+1)]
         adj_mat[i,idx] <- exp(-dist_mat[i,idx]/sigma)
         adj_mat[idx,i] <- exp(-dist_mat[i,idx]/sigma)
     }
@@ -126,16 +137,15 @@ normalization = "uq", max_iter = 10000, imputation = FALSE, verbose = TRUE, opti
     w_list <- initial$w
     R_list <- initial$R
 
-    sample_num <- sapply(O_norm,ncol)
     x0 <- convert_to_vec_transfer(m, w_list, R_list)
 
     lower <- c(rep(0,m*d),rep(-Inf,r*sum(sample_num)))
     upper <- c(rep(1,m*d),rep(Inf,r*sum(sample_num)))
 
      if (optim_trace){
-        trace = 3
+        trace <- 3
     }else{
-        trace = 0
+        trace <- 0
     }
     
     optim.res <- optim(x0, fn = (function(x) target_func_transfer(x,O_norm,D,alpha,beta,gamma,m,d,r,sample_num,L)), 
@@ -161,7 +171,14 @@ normalization = "uq", max_iter = 10000, imputation = FALSE, verbose = TRUE, opti
     }
 
 
-    error_each <- sapply(1:length(O_norm), function(i) norm(O_norm[[i]]-diag(w_list[i,])%*%X_list[[i]], "F")^2/norm(O_norm[[i]],"F")^2)
+    error_each <- vapply(1:length(O_norm),
+                            function(i) {
+                                norm(O_norm[[i]] - diag(w_list[i, ]) %*% X_list[[i]], "F")^2 /
+                                norm(O_norm[[i]], "F")^2
+                            },
+                            numeric(1)
+                            )
+
 
 
     if(optim.res$convergence==0){
@@ -170,7 +187,7 @@ normalization = "uq", max_iter = 10000, imputation = FALSE, verbose = TRUE, opti
     if(optim.res$convergence==1){
         message("The iteration limit max_iter has been reached. Please consider increasing max_iter.")
     }
-    message(paste("Maximum relative error:", max(error_each), "\n"))
+    message(sprintf("Maximum relative error: %f\n", max(error_each)))
 
     if (verbose){
         message("Finished.")

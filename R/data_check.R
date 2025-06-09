@@ -32,11 +32,11 @@ data_check <- function(count, meta, covariates = "all", distance_matrix = NULL, 
     }
 
     # check non-numeric value
-    non_numeric_columns = vapply(count, function(col) !is.numeric(col), logical(1))
+    non_numeric_columns <- vapply(count, function(col) !is.numeric(col), logical(1))
     if (any(non_numeric_columns)){
         stop("All columns must be numeric.")
     }
-    taxa_name = rownames(count)
+    taxa_name <- rownames(count)
     if(is.null(taxa_name)){
         stop("Please set the rownames of count table as taxa names.")
     }
@@ -79,7 +79,7 @@ data_check <- function(count, meta, covariates = "all", distance_matrix = NULL, 
 
         # generate adjacency matrix
         adj_mat <- matrix(0, nrow = length(taxa_name), ncol = length(taxa_name))
-        taxonomy_subset <- taxonomy[taxa_name, 1:(col_index-1), drop = FALSE]  # Extract columns before col_index
+        taxonomy_subset <- taxonomy[taxa_name, seq_len(col_index - 1), drop = FALSE]  # Extract columns before col_index
         adj_mat <- as.matrix(
             outer(1:length(taxa_name), 1:length(taxa_name), 
             Vectorize(function(i, j) as.numeric(all(taxonomy_subset[i, ] == taxonomy_subset[j, ])))
@@ -122,7 +122,7 @@ data_check <- function(count, meta, covariates = "all", distance_matrix = NULL, 
         alpha <- 0.1
     }
 
-    batch_name = unique(batchid)
+    batch_name <- unique(batchid)
 
     # Create a list of sample IDs for each batch
     sample_list <- lapply(batch_name, function(x) {
@@ -139,12 +139,12 @@ data_check <- function(count, meta, covariates = "all", distance_matrix = NULL, 
         meta_filtered[sample_list[[i]], , drop = FALSE]  # Keep as data frame
     })
 
-    r = sum(svd(as.matrix(count))$d>1e-3)
+    r <- sum(svd(as.matrix(count))$d>1e-3)
 
     if (verbose) {
         message("PASS")
     }
-    output = list(count_list = O.list,
+    output <- list(count_list = O.list,
                   meta_list = meta.list,
                   dist_mat = dist_mat,
                   controls = list(alpha = alpha, beta = beta, neighbor = neighbor, sigma = sigma, 

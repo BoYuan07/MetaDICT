@@ -71,3 +71,15 @@ previously integrated dataset, enabling seamless application without retraining.
 This function estimates measurement efficiency and debiased representations for new studies
 while keeping the dictionary unchanged.
 }
+\examples{
+ data(exampleData)
+ O = exampleData$O
+ meta = exampleData$meta
+ dist_mat = exampleData$dist_mat
+ metadict_res = MetaDICT(O, meta, distance_matrix = dist_mat)
+ data("exampleData_transfer")
+ new_data = exampleData_transfer$new_data
+ new_meta = exampleData_transfer$new_meta
+ new_data_res = metadict_add_new_data(new_data, new_meta, metadict_res)
+
+}

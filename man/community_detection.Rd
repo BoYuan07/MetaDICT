@@ -33,3 +33,14 @@ A \code{list} with the following components:
 A \code{k}-nearest neighbor graph is constructed based on Euclidean distance. Then community detection method is applied to identify communities.
 Various values of \code{k} within a specific range are tried and the one that yields the highest average Silhouette score is selected.
 }
+\examples{
+ data(exampleData)
+ O = exampleData$O
+ meta = exampleData$meta
+ dist_mat = exampleData$dist_mat
+ metadict_res = MetaDICT(O, meta, distance_matrix = dist_mat)
+ D = metadict_res$D
+ D_filter = D[,1:20]
+ taxa_c = community_detection(D_filter, max_k = 5)
+
+}

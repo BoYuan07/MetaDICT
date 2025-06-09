@@ -75,14 +75,15 @@ normalization = "uq", max_iter = 10000, imputation = FALSE, verbose = TRUE, opti
     d <- nrow(dist_mat)
     gamma <- 1
     O <- do.call(cbind, O.list)
-    sample_num <- sapply(O.list,ncol)
+    sample_num <- vapply(O.list, ncol, integer(1))
+
 
     if (!customize_parameter){
         alpha <- controls$alpha
         beta <- controls$beta
     }
     if (verbose){
-        message(paste("Paremeters are set to be", "alpha = ", alpha, "beta = ", beta))
+        message(sprintf("Parameters are set to be: alpha = %f, beta = %f", alpha, beta))
     }
 
     # normalization
@@ -90,11 +91,10 @@ normalization = "uq", max_iter = 10000, imputation = FALSE, verbose = TRUE, opti
         if (is.null(normalization)){
             message("Normalization is skipped.")
         }else if (! normalization %in% c("uq", "rsim")){
-            stop(paste("Normalization method is not supported by MetaDICT!",
-            "Please run normalization first then used the normalized counts as input while
-            set Normalization = FALSE.", sep = "\n"))
+            stop(sprintf("Normalization method is not supported by MetaDICT!\nPlease run normalization first, then use the normalized counts as input while setting Normalization = FALSE."))
+
         }else{
-            message(paste("Normalization starts with method", normalization))  
+            message(sprintf("Normalization starts with method %s", normalization)) 
         }
     }
     if(is.null(normalization)){
@@ -114,7 +114,7 @@ normalization = "uq", max_iter = 10000, imputation = FALSE, verbose = TRUE, opti
     # Laplacian matrix of sequencing graph
     adj_mat <- matrix(0,d,d)
     for(i in 1:d){
-        idx <- order(dist_mat[i,],decreasing = F)[2:(neighbor+1)]
+        idx <- order(dist_mat[i,],decreasing = FALSE)[2:(neighbor+1)]
         adj_mat[i,idx] <- exp(-dist_mat[i,idx]/sigma)
         adj_mat[idx,i] <- exp(-dist_mat[i,idx]/sigma)
     }
@@ -133,9 +133,9 @@ normalization = "uq", max_iter = 10000, imputation = FALSE, verbose = TRUE, opti
     upper <- c(rep(1,m*d),rep(Inf,d*r+r*sum(sample_num)))
 
     if (optim_trace){
-        trace = 3
+        trace <- 3
     }else{
-        trace = 0
+        trace <- 0
     }
 
     optim.res <- optim(x0, fn = (function(x) target_func(x,O_list_scaled,alpha,beta,gamma,m,d,r,sample_num,L)), 
@@ -172,8 +172,14 @@ normalization = "uq", max_iter = 10000, imputation = FALSE, verbose = TRUE, opti
 
     effective_r <- effective_rank(D)
 
-    error_each <- sapply(1:length(O_norm), function(i) norm(O_norm[[i]]-diag(w_list[i,])%*%X_list[[i]], "F")^2/norm(O_norm[[i]],"F")^2)
-
+    error_each <- vapply(
+    seq_along(O_norm),
+    function(i) {
+        norm(O_norm[[i]] - diag(w_list[i, ]) %*% X_list[[i]], "F")^2 /
+        norm(O_norm[[i]], "F")^2
+    },
+    numeric(1)
+    )
 
     if(optim.res$convergence==0){
         message("Successful convergence.")
@@ -181,7 +187,11 @@ normalization = "uq", max_iter = 10000, imputation = FALSE, verbose = TRUE, opti
     if(optim.res$convergence==1){
         message("The iteration limit max_iter has been reached. Please consider increasing max_iter.")
     }
-    message(paste("Maximum relative error:", max(error_each), "\n", "Effective rank of D", effective_r))
+    message(sprintf(
+    "Maximum relative error: %f\nEffective rank of D: %f",
+    max(error_each),
+    effective_r
+    ))
 
     if (verbose){
         message("Finished.")
@@ -264,7 +274,7 @@ target_func <- function(x, O_list, alpha, beta, gamma, m, d, r, sample_num, L){
   return(target)
 }
 
-gradient_func = function(x, O_list, alpha, beta, gamma, m, d, r, sample_num, L){
+gradient_func <- function(x, O_list, alpha, beta, gamma, m, d, r, sample_num, L){
   res <- convert_from_vec(x,m,r,d,sample_num)
   w_list <- res$w
   D <- res$D
@@ -357,11 +367,18 @@ rsim <- function(X,eta=0.1){
     X0 <- X[I0.1,]
     v0 <- replicate(3,CStat(X0[sample(1:nrow(X0),0.5*nrow(X0)),]))
     w <- v[v>gamma]
-    f1 <- sapply(w,function(x)mean(v>x))
-    f0 <- sapply(w,function(x)mean(v0>x))
+    f1 <- vapply(w, function(x) mean(v > x), numeric(1))
+    f0 <- vapply(w, function(x) mean(v0 > x), numeric(1))
+
     pi_val <- sum(f1*f0)/sum(f0^2)
-    vord <- order(v,decreasing = T)
-    res <- sapply(1:length(vord),function(x)(1-pi_val*length(vord)*mean(v0>v[x])/(which(vord==x))))
+    vord <- order(v,decreasing = TRUE)
+    res <- vapply(
+    seq_along(vord),
+    function(x) {
+        1 - pi_val * length(vord) * mean(v0 > v[x]) / which(vord == x)
+    },
+    numeric(1)
+    )
     lowerx <- max(which(res[vord]<eta))
     ref <- vord[1:lowerx]
     tc.cn <- apply(X,2,function(x)sum(x[ref]))

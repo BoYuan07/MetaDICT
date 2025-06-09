@@ -22,3 +22,10 @@ This function produces singular value plots for each input dataset to assess
 the validity of the low-rank assumption. A rapid decay in the singular values
 indicates that the dataset can be effectively approximated by matrix factorization.
 }
+\examples{
+ data(exampleData)
+ O = exampleData$O
+ meta = exampleData$meta
+ plot_singular_values(O, meta)
+
+}
