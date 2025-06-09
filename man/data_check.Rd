@@ -32,6 +32,8 @@ and batch id.}
 \item{taxonomy}{The taxonomy table (optional if distance matrix or phylogenetic tree is provided).}
 
 \item{tax_level}{The taxonomic level of count table.}
+
+\item{verbose}{Logical; whether to print progress messages. Default is TRUE.}
 }
 \value{
 a \code{list} contains count list, meta table list, sequencing distance

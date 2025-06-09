@@ -1,3 +1,4 @@
+utils::globalVariables(c("taxon", "value"))
 #' @title Generate Singular Value Plots for Each Dataset.
 #' 
 #' @import ggplot2

@@ -65,7 +65,6 @@ based on dictionary learning results. Default is \code{FALSE}.}
 }
 \value{
 A \code{list} with the following components:
-\itemize{
 \item{\code{count}}{ (\code{data.frame}) – The corrected count table.
 Rows represent taxa, and columns represent samples.}
 \item{\code{D}}{ (\code{matrix}) – The estimated shared dictionary.}
@@ -74,7 +73,6 @@ Rows represent taxa, and columns represent samples.}
 Rows represent datasets, and columns represent taxa.}
 \item{\code{meta}}{ (\code{data.frame}) – The meta table used in the covariate balancing step.}
 \item{\code{dist_mat}}{ (\code{matrix}) – The distance matrix measuring taxa dissimilarity.}
-}
 }
 \description{
 A method for microbiome data integration. This method is designed to
@@ -87,6 +85,9 @@ then refines the estimation via shared dictionary learning.
 }
 \examples{
  data(exampleData)
- metadict_res = metadict(O, meta, distance_matrix = dist_mat)
+ O = exampleData$O
+ meta = exampleData$meta
+ dist_mat = exampleData$dist_mat
+ metadict_res = MetaDICT(O, meta, distance_matrix = dist_mat)
 
 }

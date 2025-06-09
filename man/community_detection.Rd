@@ -26,10 +26,8 @@ Rows represent clustering objects, and columns represent features.}
 }
 \value{
 A \code{list} with the following components:
-\itemize{
 \item{\code{cluster}}{ – The estimated cluster labels.}
 \item{\code{graph}}{ – The \code{k}-nearest neighbor graph.}
-}
 }
 \description{
 A \code{k}-nearest neighbor graph is constructed based on Euclidean distance. Then community detection method is applied to identify communities.

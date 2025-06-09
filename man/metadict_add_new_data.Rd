@@ -53,7 +53,6 @@ Whether to print optimization steps. Default is \code{FALSE}.}
 }
 \value{
 A \code{list} with the following components:
-\itemize{
 \item{\code{count}}{ (\code{data.frame}) – The corrected count table.
 Rows represent taxa, and columns represent samples.}
 \item{\code{D}}{ (\code{matrix}) – The estimated shared dictionary.}
@@ -62,7 +61,6 @@ Rows represent taxa, and columns represent samples.}
 Rows represent datasets, and columns represent taxa.}
 \item{\code{meta}}{ (\code{data.frame}) – The meta table used in the covariate balancing step.}
 \item{\code{dist_mat}}{ (\code{matrix}) – The distance matrix measuring taxa dissimilarity.}
-}
 }
 \description{
 This function adds new studies to an integrated dataset using a pre-learned dictionary.

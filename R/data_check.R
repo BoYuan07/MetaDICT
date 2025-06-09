@@ -12,6 +12,7 @@
 #' @param tree The phylogenetic tree (optional if distance matrix or taxonomy is provided).
 #' @param taxonomy The taxonomy table (optional if distance matrix or phylogenetic tree is provided).
 #' @param tax_level The taxonomic level of count table.
+#' @param verbose Logical; whether to print progress messages. Default is TRUE.
 #'
 #' @return a \code{list} contains count list, meta table list, sequencing distance
 #' matrix and parameters.

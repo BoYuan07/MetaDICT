@@ -7,7 +7,7 @@
 #' @details This function estimates measurement efficiency and debiased representations for new studies  
 #' while keeping the dictionary unchanged.  
 #'
-#' @importFrom stats optim
+#' @importFrom stats optim glm predict
 #' @importFrom edgeR calcNormFactors
 #'
 #' @param newdata The integrated count table of new studies.  
@@ -35,7 +35,6 @@
 #'   Whether to print optimization steps. Default is \code{FALSE}.
 #' 
 #' @returns A \code{list} with the following components:
-#' \itemize{
 #'   \item{\code{count}}{ (\code{data.frame}) – The corrected count table.  
 #'     Rows represent taxa, and columns represent samples.}
 #'   \item{\code{D}}{ (\code{matrix}) – The estimated shared dictionary.}
@@ -44,7 +43,6 @@
 #'     Rows represent datasets, and columns represent taxa.}
 #'   \item{\code{meta}}{ (\code{data.frame}) – The meta table used in the covariate balancing step.}
 #'   \item{\code{dist_mat}}{ (\code{matrix}) – The distance matrix measuring taxa dissimilarity.}
-#' }
 #' 
 #' @export
 #' 
@@ -179,8 +177,8 @@ normalization = "uq", max_iter = 10000, imputation = FALSE, verbose = TRUE, opti
     }
     meta_filtered <- do.call(rbind,meta.list)
     res.metadict <- as.data.frame(X)
-    colnames(res.metadict) <- colnames(count)
-    rownames(res.metadict) <- rownames(count)
+    colnames(res.metadict) <- colnames(newdata)
+    rownames(res.metadict) <- rownames(newdata)
 
     return(list(count = res.metadict, D = D, R = R_list, w = w_list, meta = meta_filtered, dist_mat = dist_mat))
 }

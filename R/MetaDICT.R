@@ -9,6 +9,7 @@
 #'
 #' @importFrom stats optim
 #' @importFrom edgeR calcNormFactors
+#' @importFrom stats varimax dist median glm predict
 #'
 #' @param count The integrated count table (taxa-by-sample matrix).  
 #'   Should be provided as either a \code{matrix} or a \code{data.frame}.
@@ -37,7 +38,6 @@
 #' @param optim_trace A logical variable. Whether to print optimization steps. Default is \code{FALSE}.
 #'
 #' @returns A \code{list} with the following components:
-#' \itemize{
 #'   \item{\code{count}}{ (\code{data.frame}) – The corrected count table.  
 #'     Rows represent taxa, and columns represent samples.}
 #'   \item{\code{D}}{ (\code{matrix}) – The estimated shared dictionary.}
@@ -46,11 +46,13 @@
 #'     Rows represent datasets, and columns represent taxa.}
 #'   \item{\code{meta}}{ (\code{data.frame}) – The meta table used in the covariate balancing step.}
 #'   \item{\code{dist_mat}}{ (\code{matrix}) – The distance matrix measuring taxa dissimilarity.}
-#' }
 #'
 #' @examples 
 #'  data(exampleData)
-#'  metadict_res = metadict(O, meta, distance_matrix = dist_mat)
+#'  O = exampleData$O
+#'  meta = exampleData$meta
+#'  dist_mat = exampleData$dist_mat
+#'  metadict_res = MetaDICT(O, meta, distance_matrix = dist_mat)
 #' 
 #' @export
 #' 

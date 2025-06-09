@@ -1,18 +1,22 @@
 Package: MetaDICT
-Title: Microbiome data integration method via shared dictionary learning.
+Title: Microbiome data integration method via shared dictionary learning
 Version: 0.0.0.9000
-Authors@R: person("Bo", "Yuan", , "boyuan5@illinois.edu", role = c("aut", "cre"))
+Authors@R: c(person("Bo", "Yuan", email = "boyuan5@illinois.edu", role = c("aut", "cre")))
 Description: MetaDICT is a method for the integration of microbiome data. This method is designed to remove batch effects and preserve biological variation while integrating heterogeneous datasets. MetaDICT can better avoid overcorrection when unobserved confounding variables are present.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
-Imports: stats, RANN, igraph, vegan, edgeR, ecodist, ggplot2, viridis, ggpubr
+Depends: R (>= 3.5.0)
+Imports: stats, RANN, igraph, vegan, edgeR, ecodist, ggplot2, viridis, ggpubr, ape, cluster, matrixStats
 BugReports: https://github.com/BoYuan07/MetaDICT/issues
 URL: https://github.com/BoYuan07/MetaDICT
 Suggests: 
     knitr,
     rmarkdown,
+    DT,
+    ggraph,
+    tidyverse,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 LazyData: True

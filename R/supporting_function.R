@@ -1,3 +1,5 @@
+utils::globalVariables(c("Y", "Sample", "colorset"))
+
 #' @title Taxa/Sample Community detection.
 #'
 #' @description A \code{k}-nearest neighbor graph is constructed based on Euclidean distance. Then community detection method is applied to identify communities. 
@@ -15,10 +17,8 @@
 #' @param resolution The resolution parameter for the Louvain algorithm.
 #'
 #' @returns A \code{list} with the following components:
-#' \itemize{
 #'   \item{\code{cluster}}{ – The estimated cluster labels.}
 #'   \item{\code{graph}}{ – The \code{k}-nearest neighbor graph.}
-#' }
 #' 
 #' @export
 community_detection <- function(X, max_k = 10, method = "Louvain", resolution=1, min_k = 2){
@@ -61,6 +61,7 @@ cluster_core = function(X,k,resolution,method = "Louvain"){
 #' @importFrom vegan adonis2
 #' @importFrom ecodist bcdist
 #' @import ggplot2
+#' @importFrom stats dist cmdscale
 #'
 #' @param X Abundance matrix.  
 #'   Rows represent taxa, and columns represent samples.
@@ -124,6 +125,7 @@ permanova_pcoa <- function(distP, Y) {
 #' @importFrom ecodist bcdist
 #' @import ggplot2
 #' @import viridis
+#' @importFrom stats dist cmdscale
 #'
 #' @param X Abundance matrix.  
 #'   Rows represent taxa, and columns represent samples.
