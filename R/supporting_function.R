@@ -8,6 +8,7 @@ utils::globalVariables(c("Y", "Sample", "colorset", "Signal"))
 #' @importFrom RANN nn2
 #' @importFrom igraph cluster_louvain
 #' @importFrom igraph cluster_walktrap
+#' @importFrom cluster silhouette
 #'
 #' @param X Input data.  
 #'   Rows represent clustering objects, and columns represent features.
@@ -43,8 +44,8 @@ community_detection <- function(X, max_k = 10, method = "Louvain", resolution=1,
   }
   best_k <- k.list[which.max(avg_silwidth)]
   best_res <- cluster_core(X,best_k,resolution,method)
-  clustring <- paste("Cluster", best_res$membership)
-  return(list("cluster" = clustring, "graph" = best_res$graph))
+  clustering <- paste("Cluster", best_res$membership)
+  return(list("cluster" = clustering, "graph" = best_res$graph))
 }
 
 cluster_core <- function(X,k,resolution,method = "Louvain"){
@@ -91,12 +92,12 @@ cluster_core <- function(X,k,resolution,method = "Louvain"){
 #'  O = exampleData$O
 #'  meta = exampleData$meta
 #'  batchid = meta$batch
-#'  pcoa.plot.discrete(O,batchid,"Batch")
+#'  pcoa_plot_discrete(O,batchid,"Batch")
 #'
 #' @returns a PCoA plot.
 #'
 #' @export
-pcoa.plot.discrete <- function(X, covariate, title, R2 = TRUE, dissimilarity = "Bray-Curtis", colorset = "Set1",point_size = 1){
+pcoa_plot_discrete <- function(X, covariate, title, R2 = TRUE, dissimilarity = "Bray-Curtis", colorset = "Set1",point_size = 1){
   if(dissimilarity == "Bray-Curtis"){
      dist_matrix <- bcdist(t(X))
   }else if(dissimilarity == "Euclidean"){
@@ -160,12 +161,12 @@ permanova_pcoa <- function(distP, Y) {
 #'  data(exampleData)
 #'  O = exampleData$O
 #'  Y = runif(ncol(O))
-#'  pcoa.plot.continuous(O,Y,"Y")
+#'  pcoa_plot_continuous(O,Y,"Y")
 #'
 #' @returns a PCoA plot.
 #'
 #' @export
-pcoa.plot.continuous <- function(X, covariate, title, R2 = TRUE, dissimilarity = "Bray-Curtis", point_size = 1){
+pcoa_plot_continuous <- function(X, covariate, title, R2 = TRUE, dissimilarity = "Bray-Curtis", point_size = 1){
   if(dissimilarity == "Bray-Curtis"){
      dist_matrix <- bcdist(t(X))
   }else if(dissimilarity == "Euclidean"){

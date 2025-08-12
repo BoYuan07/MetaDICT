@@ -10,6 +10,7 @@
 #' @importFrom stats optim
 #' @importFrom edgeR calcNormFactors
 #' @importFrom stats varimax dist median glm predict
+#' @importFrom matrixStats colMedians
 #'
 #' @param count The integrated count table (taxa-by-sample matrix).  
 #'   Should be provided as either a \code{matrix} or a \code{data.frame}.

@@ -3,7 +3,7 @@ title: "MetaDICT Tutorial"
 author: 
   - Bo Yuan
 date: '`r format(Sys.Date(), "%B %d, %Y")`'
-output: rmarkdown::html_vignette
+output: BiocStyle::html_document
 bibliography: bibliography.bib
 vignette: >
   %\VignetteIndexEntry{MetaDICT Tutorial}
@@ -34,7 +34,7 @@ The method operates in **two stages**:
 
 2. **Refinement via Shared Dictionary Learning** – Further refines batch effect estimation by leveraging shared structures across datasets.  
 
-Compared to existing methods, **MetaDICT minimizes overcorrection** when **unobserved confounding variables** are present, ensuring a more reliable integration of datasets. The resulting integrated data can be applied to **downstream analyses**, including **Principal Coordinates Analysis (PCoA)**, **taxa/sample community detection**, and **differential abundance test**. For more details, please refer to the MetaDICT paper [@yuan2024microbiome].
+Compared with regression-based approaches, **MetaDICT minimizes overcorrection** when **unobserved confounding variables** are present, ensuring a more reliable integration of datasets. The resulting integrated data can be applied to **downstream analyses**, including **Principal Coordinates Analysis (PCoA)**, **taxa/sample community detection**, and **differential abundance test**. For more details, please refer to the MetaDICT paper [@yuan2024microbiome].
 
 # Installation
 
@@ -97,7 +97,7 @@ Significant batch effects are observed between these two datasets on PCoA plots.
 batchid = meta$batch
 
 # PCoA plot
-pcoa.plot.discrete(O,batchid,"Batch")
+pcoa_plot_discrete(O,batchid,"Batch")
 ```
 
 The PCoA plots of target variable `Y`:
@@ -107,7 +107,7 @@ The PCoA plots of target variable `Y`:
 Y = meta$Y
 
 # PCoA plot
-pcoa.plot.discrete(O,Y,"Sample", colorset = "Set2")
+pcoa_plot_discrete(O,Y,"Sample", colorset = "Set2")
 ```
 
 ## Check the singular values of each dataset
@@ -149,10 +149,10 @@ Batch effect is significantly reduced using MetaDICT:
 
 ```{r}
 # PCoA plot of batch variable
-pcoa.plot.discrete(X,batchid,"Batch")
+pcoa_plot_discrete(X,batchid,"Batch")
 
 # PCoA plot of sample covariate
-pcoa.plot.discrete(X,Y,"Sample",colorset = "Set2")
+pcoa_plot_discrete(X,Y,"Sample",colorset = "Set2")
 ```
 
 ## Run MetaDICT with the phylogenetic tree
@@ -166,10 +166,10 @@ X1 = metadict_res1$count
 
 ```{r}
 # PCoA plot of batch variable
-pcoa.plot.discrete(X1,batchid,"Batch")
+pcoa_plot_discrete(X1,batchid,"Batch")
 
 # PCoA plot of sample covariate
-pcoa.plot.discrete(X1,Y,"Sample",colorset = "Set2")
+pcoa_plot_discrete(X1,Y,"Sample",colorset = "Set2")
 ```
 
 ## Run MetaDICT with the taxonomy information
@@ -183,10 +183,10 @@ X2 = metadict_res2$count
 ```
 ```{r}
 # PCoA plot of batch variable
-pcoa.plot.discrete(X2,batchid,"Batch")
+pcoa_plot_discrete(X2,batchid,"Batch")
 
 # PCoA plot of sample covariate
-pcoa.plot.discrete(X2,Y,"Sample",colorset = "Set2")
+pcoa_plot_discrete(X2,Y,"Sample",colorset = "Set2")
 ```
 
 ## Run MetaDICT with the specified covariate
@@ -200,10 +200,10 @@ X3 = metadict_res3$count
 ```
 ```{r}
 # PCoA plot of batch variable
-pcoa.plot.discrete(X3,batchid,"Batch")
+pcoa_plot_discrete(X3,batchid,"Batch")
 
 # PCoA plot of sample covariate
-pcoa.plot.discrete(X3,Y,"Sample",colorset = "Set2")
+pcoa_plot_discrete(X3,Y,"Sample",colorset = "Set2")
 ```
 
 ## Run MetaDICT with customized parameters
@@ -243,10 +243,10 @@ Before batch correction:
 
 ```{r}
 # PCoA plot of batch variable
-pcoa.plot.discrete(all_count_raw,all_meta$batch,"Batch")
+pcoa_plot_discrete(all_count_raw,all_meta$batch,"Batch")
 
 # PCoA plot of sample covariate
-pcoa.plot.discrete(all_count_raw,all_meta$Y,"Sample",colorset = "Set2")
+pcoa_plot_discrete(all_count_raw,all_meta$Y,"Sample",colorset = "Set2")
 ```
 
 After batch correction:
@@ -254,10 +254,10 @@ After batch correction:
 
 ```{r}
 # PCoA plot of batch variable
-pcoa.plot.discrete(all_count_corrected,all_meta$batch,"Batch")
+pcoa_plot_discrete(all_count_corrected,all_meta$batch,"Batch")
 
 # PCoA plot of sample covariate
-pcoa.plot.discrete(all_count_corrected,all_meta$Y,"Sample",colorset = "Set2")
+pcoa_plot_discrete(all_count_corrected,all_meta$Y,"Sample",colorset = "Set2")
 ```
 
 
