@@ -7,7 +7,8 @@ test_that("Transfer learning is successfully applied", {
   O = exampleData$O
   meta = exampleData$meta
   dist_mat = exampleData$dist_mat
-  metadict_res = MetaDICT(O, meta, distance_matrix = dist_mat)
+  metadict_res = MetaDICT(O, meta, distance_matrix = dist_mat,
+                         customize_parameter = TRUE, alpha = 0.01, beta = 0.01)
   X = metadict_res$count
   D = metadict_res$D
   R_list = metadict_res$R

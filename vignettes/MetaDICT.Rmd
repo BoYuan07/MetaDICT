@@ -212,7 +212,7 @@ MetaDICT includes two predefined parameters $\alpha$ and $\beta$. The parameter 
 
 ```{r}
 metadict_res4 = MetaDICT(O,meta,distance_matrix = dist_mat,
-                         customize_parameter = TRUE, alpha = 0.01, beta = 0.1)
+                         customize_parameter = TRUE, alpha = 0.01, beta = 0.01)
 ```
 
 # Add new datasets to an existing integrated study

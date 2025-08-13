@@ -35,7 +35,8 @@ test_that("Function community_detection works", {
   O = exampleData$O
   meta = exampleData$meta
   dist_mat = exampleData$dist_mat
-  metadict_res = MetaDICT(O, meta, distance_matrix = dist_mat)
+  metadict_res = MetaDICT(O, meta, distance_matrix = dist_mat,
+                         customize_parameter = TRUE, alpha = 0.01, beta = 0.01)
   X = metadict_res$count
   D = metadict_res$D
   D_filter = D[,1:20]
