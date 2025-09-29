@@ -1,6 +1,6 @@
 Package: MetaDICT
 Title: Microbiome data integration method via shared dictionary learning
-Version: 0.99.3
+Version: 0.99.4
 Authors@R: c(person("Bo", "Yuan", email = "boyuan5@illinois.edu", role = c("aut", "cre"), comment = c(ORCID = "0009-0008-5428-4447")),person("Shulei", "Wang", email = "shuleiw@illinois.edu", role = "aut"))
 Description: MetaDICT is a method for the integration of microbiome data. This method is designed to remove batch effects and preserve biological variation while integrating heterogeneous datasets. MetaDICT can better avoid overcorrection when unobserved confounding variables are present.
 License: Artistic-2.0
@@ -18,6 +18,7 @@ biocViews:
     Clustering,
     Software
 Suggests: 
+    BiocStyle,
     knitr,
     rmarkdown,
     DT,
