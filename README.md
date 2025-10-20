@@ -14,8 +14,15 @@ MetaDICT is a method for the integration of microbiome datasets. This method is 
 
 ## Installation:
 
-Our R package has been tested on R version 4.4.2. The package can be downloaded from GitHub: 
+Our R package has been tested on R version 4.4.2. The package can be downloaded from Bioconductor: 
 
+```
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install("MetaDICT")
+```
+
+or from github:
 ```
 devtools::install_github("BoYuan07/MetaDICT", build_vignettes = TRUE)
 ```
