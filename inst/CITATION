@@ -5,8 +5,8 @@ bibentry(
     person("Bo", "Yuan", email = "boyuan5@illinois.edu", role = c("aut", "cre")),
     person("Shulei", "Wang", email = "shuleiw@illinois.edu", role = "aut")
   ),
-  journal = "bioRxiv",
-  year    = 2024,
-  doi     = "10.1101/2024.10.04.616752",
-  textVersion = "Yuan B and Wang S (2024). Microbiome Data Integration via Shared Dictionary Learning. bioRxiv. https://doi.org/10.1101/2024.10.04.616752"
+  journal = "Nature Communications",
+  year    = 2025,
+  doi     = "10.1038/s41467-025-63425-y",
+  textVersion = "Yuan, B. and Wang, S. Microbiome Data Integration via Shared Dictionary Learning. Nature Communications, 16(1), 8147 (2025)"
 )
